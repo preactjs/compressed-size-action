@@ -3,15 +3,14 @@
   "version": "0.1.0",
   "main": "index.js",
   "scripts": {
-    "build": "microbundle -f cjs --compress --no-sourcemap --target node action.js"
+    "build": "microbundle -f cjs --define 'navigator={}' --compress --no-sourcemap --target node action.js"
   },
   "license": "MIT",
   "devDependencies": {
     "@actions/core": "^1.2.1",
     "@actions/exec": "^1.0.3",
     "@actions/github": "^2.0.1",
-    "microbundle": "^0.11.0",
+    "microbundle": "^0.12.0-next.8",
     "size-plugin-core": "0.0.7"
-  },
-  "dependencies": {}
+  }
 }
