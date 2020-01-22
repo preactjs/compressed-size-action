@@ -9,10 +9,7 @@ async function run(octokit, context) {
 	const pr = (await octokit.pulls.get({ owner, repo, pull_number })).data;
 
 	const plugin = new SizePlugin({
-		pattern: process.env.PATTERN || [
-			'dist/*.js',
-			'**/dist/*.js'
-		],
+		pattern: process.env.PATTERN || 'dist/*.js,**/dist/*.js',
 		exclude: '*.map'
 	});
 
