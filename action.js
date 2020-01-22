@@ -6,7 +6,11 @@ import SizePlugin from 'size-plugin-core';
 
 async function run(octokit, context) {
 	const { owner, repo, number: pull_number } = context.issue;
+	console.log('context', { owner, repo, pull_number });
+
 	const pr = (await octokit.pulls.get({ owner, repo, pull_number })).data;
+
+	console.log('pr', pr);
 
 	const plugin = new SizePlugin({
 		pattern: process.env.PATTERN || 'dist/*.js,**/dist/*.js',
@@ -20,6 +24,11 @@ async function run(octokit, context) {
 	const newSizes = await plugin.readFromDisk(cwd);
 
 	console.log('computing old sizes');
+	try {
+		await exec(`git fetch`);
+	} catch (e) {
+		console.log('fetch failed', e.message);
+	}
 	await exec(`git checkout ${pr.base.sha}`);
 	await exec(`npm ci && npm run build`);
 	const oldSizes = await plugin.readFromDisk(cwd);
