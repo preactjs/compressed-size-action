@@ -1,19 +1,17 @@
 {
   "name": "gzip-size-action",
   "version": "0.1.0",
-  "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "microbundle -f cjs --compress --no-sourcemap --target node action.js"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "dependencies": {
+  "license": "MIT",
+  "devDependencies": {
     "@actions/core": "^1.2.1",
     "@actions/exec": "^1.0.3",
     "@actions/github": "^2.0.1",
-    "esm": "^3.2.25",
+    "microbundle": "^0.11.0",
     "size-plugin-core": "0.0.7"
-  }
+  },
+  "dependencies": {}
 }
