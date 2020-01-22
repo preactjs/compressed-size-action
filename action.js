@@ -38,7 +38,7 @@ async function run(octokit, context) {
 	});
 }
 
-export default async () => {
+(async () => {
 	try {
 		const token = getInput('repo-token', { required: true });
 		const octokit = new GitHub(token);
@@ -46,4 +46,4 @@ export default async () => {
 	} catch (e) {
 		setFailed(e.message);
 	}
-};
+})();
