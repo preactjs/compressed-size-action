@@ -1,0 +1,2 @@
+require('esm')();
+require('./action');

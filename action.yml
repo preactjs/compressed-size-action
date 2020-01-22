@@ -1,0 +1,12 @@
+name: 'gzip-size action'
+description: 'Get compressed size differences for every PR'
+author: 'Jason Miller'
+branding:
+  icon: 'archive'
+  color: 'purple'
+inputs:
+  repo-token:
+    description: 'The GITHUB_TOKEN secret'
+runs:
+  using: 'node12'
+  main: 'index.js'
