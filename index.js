@@ -1,2 +1,1 @@
-require('esm')();
-require('./action');
+require('esm')(module)('./action');
