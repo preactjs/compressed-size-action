@@ -11,6 +11,7 @@ async function run(octokit, context) {
 	const pr = (await octokit.pulls.get({ owner, repo, pull_number })).data;
 
 	const plugin = new SizePlugin({
+		compression: getInput('compression'),
 		pattern: getInput('pattern') || '**/dist/*.js',
 		exclude: getInput('exclude') || '{**/*.map,**/node_modules/**}'
 	});
@@ -58,7 +59,7 @@ async function run(octokit, context) {
 
 	const comment = {
 		...commentInfo,
-		body: markdownDiff + '\n\n<sub>gzip-size-action</sub>'
+		body: markdownDiff + '\n\n<sub>compressed-size-action</sub>'
 	};
 
 	let commentId;
@@ -72,7 +73,7 @@ async function run(octokit, context) {
 				ownerLogin: context.user && context.user.login,
 				ownerId: context.user && context.user.id
 			});
-			if (/<sub>[\s\n]*gzip-size-action/.test(comments[i].body)) {
+			if (/<sub>[\s\n]*compressed-size-action/.test(comments[i].body)) {
 				commentId = comments[i].id;
 				break;
 			}

@@ -1,4 +1,4 @@
-name: 'gzip-size action'
+name: 'compressed-size-action'
 description: 'Get compressed size differences for every PR'
 author: 'Jason Miller'
 branding:
@@ -8,6 +8,8 @@ inputs:
   repo-token:
     description: 'The GITHUB_TOKEN secret'
     required: true
+  compression:
+    description: 'The compression algorithm to use: "gzip" or "brotli"'
   show-total:
     description: 'Show total size and difference.'
     default: 'true'
