@@ -23,12 +23,18 @@ async function run(octokit, context) {
 	await exec(`npm ci && npm run build`);
 	const newSizes = await plugin.readFromDisk(cwd);
 
-	console.log('computing old sizes');
+	console.log('GIT INFO');
+	try {
+		await exec(`git remotes -v`);
+		await exec(`git branch -av`);
+	} catch (e) {}
 	try {
 		await exec(`git fetch`);
 	} catch (e) {
 		console.log('fetch failed', e.message);
 	}
+
+	console.log('computing old sizes');
 	await exec(`git checkout ${pr.base.sha}`);
 	await exec(`npm ci && npm run build`);
 	const oldSizes = await plugin.readFromDisk(cwd);
