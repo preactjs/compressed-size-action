@@ -131,8 +131,8 @@ function diffTable(files, { showTotal, collapseUnchanged, omitUnchanged }) {
 		const totalDifference = (totalDelta / totalSize * 100) | 0;
 		let totalDeltaText = getDeltaText(totalDelta, totalDifference);
 		let totalIcon = iconForDifference(totalDifference);
-		out = `**Total Size:** ${prettyBytes(totalSize)}\n\n`;
-		out = `**Size Change:** ${totalDeltaText} ${totalIcon}\n\n`;
+		out = `**Total Size:** ${prettyBytes(totalSize)}\n\n${out}`;
+		out = `**Size Change:** ${totalDeltaText} ${totalIcon}\n\n${out}`;
 	}
 
 	return out;
