@@ -18,7 +18,8 @@ async function run(octokit, context) {
 	const cwd = process.cwd();
 
 	console.log('computing new sizes');
-	await exec(`npm ci && npm run build`);
+	await exec(`npm ci`);
+	await exec(`npm run build`);
 	const newSizes = await plugin.readFromDisk(cwd);
 
 	try {
@@ -35,7 +36,8 @@ async function run(octokit, context) {
 
 	console.log('computing old sizes');
 	await exec(`git checkout ${pr.base.sha}`);
-	await exec(`npm ci && npm run build`);
+	await exec(`npm ci`);
+	await exec(`npm run build`);
 	const oldSizes = await plugin.readFromDisk(cwd);
 
 	const diff = await plugin.getDiff(oldSizes, newSizes);
