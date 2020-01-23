@@ -12,11 +12,10 @@ inputs:
     description: 'Show total size and difference.'
     default: 'true'
   collapse-unchanged:
-    description: 'Collapse the sizes table when there are no changes'
+    description: 'Move unchanged files into a separate collapsed table'
     default: 'true'
   omit-unchanged:
-    description: 'Exclude unchanged files from the sizes table'
-    default: 'true'
+    description: 'Exclude unchanged files from the sizes table entirely'
 runs:
   using: 'node12'
   main: 'index.js'

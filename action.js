@@ -107,24 +107,43 @@ async function run(octokit, context) {
 function diffTable(files, { showTotal, collapseUnchanged, omitUnchanged }) {
 	let out = `| Filename | Size | Change | |\n`;
 	out += `|:--- |:---:|:---:|:---:|\n`;
+
+	let outUnchanged = out;
+
 	let totalSize = 0;
 	let totalDelta = 0;
-	let changes = 0;
+	let unchanged = 0;
+	let changed = 0;
 	for (const file of files) {
 		const { filename, size, delta } = file;
 		totalSize += size;
 		totalDelta += delta;
 
-		if (omitUnchanged && Math.abs(delta) < 1) continue;
-		changes++;
 		const difference = (delta / size * 100) | 0;
 		let deltaText = getDeltaText(delta, difference);
 		let icon = iconForDifference(difference);
-		out += `| \`${filename}\` | ${prettyBytes(size)} | ${deltaText} | ${icon} |\n`;
+		const s = `| \`${filename}\` | ${prettyBytes(size)} | ${deltaText} | ${icon} |\n`;
+		const isUnchanged = Math.abs(delta) < 1;
+
+		if (isUnchanged && omitUnchanged) continue;
+
+		if (isUnchanged && collapseUnchanged) {
+			unchanged++;
+			outUnchanged += s;
+		}
+		else {
+			changed++;
+			out += s;
+		}
 	}
 
-	if (collapseUnchanged && changes === 0) {
-		out = `<details><summary>🎯 <strong>No size changes</strong> <em>(click to view)</em></summary>\n\n${out}\n\n</details>`;
+	// no changes, don't show an empty table
+	if (!changed) {
+		out = '';
+	}
+
+	if (unchanged) {
+		out = `\n<details><summary>ℹ️ <strong>View Unchanged</strong></summary>\n\n${outUnchanged}\n\n</details>\n\n`;
 	}
 
 	if (showTotal) {
