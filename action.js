@@ -12,7 +12,7 @@ async function run(octokit, context) {
 
 	const plugin = new SizePlugin({
 		pattern: process.env.PATTERN || '**/dist/*.js',
-		exclude: '{*.map,node_modules}'
+		exclude: '{**/*.map,**/node_modules/**}'
 	});
 
 	const cwd = process.cwd();
