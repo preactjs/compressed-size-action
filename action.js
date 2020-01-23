@@ -11,8 +11,8 @@ async function run(octokit, context) {
 	const pr = (await octokit.pulls.get({ owner, repo, pull_number })).data;
 
 	const plugin = new SizePlugin({
-		pattern: process.env.PATTERN || '**/dist/*.js',
-		exclude: '{**/*.map,**/node_modules/**}'
+		pattern: getInput('pattern') || '**/dist/*.js',
+		exclude: getInput('exclude') || '{**/*.map,**/node_modules/**}'
 	});
 
 	const cwd = process.cwd();
@@ -45,7 +45,11 @@ async function run(octokit, context) {
 	const cliText = await plugin.printSizes(diff);
 	console.log('SIZE DIFFERENCES:\n\n' + cliText);
 
-	const markdownDiff = diffTable(diff);
+	const markdownDiff = diffTable(diff, {
+		collapseUnchanged: toBool(getInput('collapse-unchanged')),
+		omitUnchanged: toBool(getInput('omit-unchanged')),
+		showTotal: toBool(getInput('show-total'))
+	});
 
 	const commentInfo = {
 		...context.repo,
@@ -65,8 +69,8 @@ async function run(octokit, context) {
 			console.log('checking comment', {
 				commentUserLogin: comments[i].user.login,
 				commentUserId: comments[i].user.id,
-				ownerLogin: owner.login,
-				ownerId: owner.id
+				ownerLogin: context.user && context.user.login,
+				ownerId: context.user && context.user.id
 			});
 			if (/<sub>[\s\n]*gzip-size-action/.test(comments[i].body)) {
 				commentId = comments[i].id;
@@ -100,20 +104,27 @@ async function run(octokit, context) {
 	console.log('All done!');
 }
 
-function diffTable(files, showTotal) {
-	let out = `| Filename | Size | Difference | |\n`;
-	out += `| ---:|:---:|:---:|:---:|\n`;
+function diffTable(files, { showTotal, collapseUnchanged, omitUnchanged }) {
+	let out = `| Filename | Size | Change | |\n`;
+	out += `|:--- |:---:|:---:|:---:|\n`;
 	let totalSize = 0;
 	let totalDelta = 0;
+	let changes = 0;
 	for (const file of files) {
 		const { filename, size, delta } = file;
 		totalSize += size;
 		totalDelta += delta;
-		
+
+		if (omitUnchanged && Math.abs(delta) < 1) continue;
+		changes++;
 		const difference = (delta / size * 100) | 0;
 		let deltaText = getDeltaText(delta, difference);
 		let icon = iconForDifference(difference);
 		out += `| \`${filename}\` | ${prettyBytes(size)} | ${deltaText} | ${icon} |\n`;
+	}
+
+	if (collapseUnchanged && changes === 0) {
+		out = `<details><summary>🎯 <strong>No size changes</strong> <em>(click to view)</em></summary>\n\n${out}\n\n</details>`;
 	}
 
 	if (showTotal) {
@@ -137,16 +148,18 @@ function getDeltaText(delta, difference) {
 
 function iconForDifference(difference) {
 	let icon = '';
-	if (difference >= 5) icon = '🔍';
-	else if (difference >= 10) icon = '⚠️';
+	if (difference >= 50) icon = '🆘';
 	else if (difference >= 20) icon = '🚨';
-	else if (difference >= 50) icon = '🆘';
-	else if (difference <= -5) icon = '✅';
+	else if (difference >= 10) icon = '⚠️';
+	else if (difference >= 5) icon = '🔍';
+	else if (difference <= -50) icon = '🏆';
+	else if (difference <= -20) icon = '🎉';
 	else if (difference <= -10) icon = '👏';
-	else if (difference <= 20) icon = '🎉';
-	else if (difference <= 50) icon = '🏆';
+	else if (difference <= -5) icon = '✅';
 	return icon;
 }
+
+const toBool = v => /^(1|true|yes)$/.test(v);
 
 (async () => {
 	try {

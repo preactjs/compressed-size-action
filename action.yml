@@ -7,6 +7,16 @@ branding:
 inputs:
   repo-token:
     description: 'The GITHUB_TOKEN secret'
+    required: true
+  show-total:
+    description: 'Show total size and difference.'
+    default: 'true'
+  collapse-unchanged:
+    description: 'Collapse the sizes table when there are no changes'
+    default: 'true'
+  omit-unchanged:
+    description: 'Exclude unchanged files from the sizes table'
+    default: 'true'
 runs:
   using: 'node12'
   main: 'index.js'
