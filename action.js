@@ -22,9 +22,15 @@ async function run(octokit, context) {
 	const newSizes = await plugin.readFromDisk(cwd);
 
 	try {
-		await exec(`git fetch -n ${pr.base.sha}`);
+		await exec(`git fetch -n origin ${pr.base.sha}`);
+		console.log('successfully fetched refspec');
 	} catch (e) {
-		console.log('fetch failed', e.message);
+		console.log('refspec fetch failed', e.message);
+		try {
+			await exec(`git fetch -n`);
+		} catch (e) {
+			console.log('fetch failed', e.message);
+		}
 	}
 
 	console.log('computing old sizes');
@@ -39,11 +45,57 @@ async function run(octokit, context) {
 
 	const markdownDiff = diffTable(diff);
 
-	await octokit.issues.createComment({
+	const commentInfo = {
 		...context.repo,
-		issue_number: pull_number,
-		body: markdownDiff
-	});
+		issue_number: pull_number
+	};
+
+	const comment = {
+		...commentInfo,
+		body: markdownDiff + '\n\n<sub>gzip-size-action</sub>'
+	};
+
+	let commentId;
+	try {
+		const comments = (await octokit.issues.listComments(commentInfo)).data;
+		for (let i=comments.length; i--; ) {
+			// TODO: check owner.login VS comment.user.login
+			console.log('checking comment', {
+				commentUserLogin: comments[i].user.login,
+				commentUserId: comments[i].user.id,
+				ownerLogin: owner.login,
+				ownerId: owner.id
+			});
+			if (/<sub>[\s\n]*gzip-size-action/.test(comments[i].body)) {
+				commentId = comments[i].id;
+				break;
+			}
+		}
+	}
+	catch (e) {
+		console.log('Error checking for previous comments: ' + e.message);
+	}
+
+	if (commentId) {
+		try {
+			await octokit.issues.updateComment({
+				...context.repo,
+				comment_id: commentId,
+				body: comment.body
+			});
+		}
+		catch (e) {
+			console.log('Error editing previous comment: ' + e.message);
+			commentId = null;
+		}
+	}
+
+	// no previous or edit failed
+	if (!commentId) {
+		await octokit.issues.createComment(comment);
+	}
+
+	console.log('All done!');
 }
 
 function diffTable(files, showTotal) {
