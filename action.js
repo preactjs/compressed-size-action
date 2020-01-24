@@ -31,7 +31,7 @@ async function run(octokit, context) {
 		exclude: getInput('exclude') || '{**/*.map,**/node_modules/**}'
 	});
 
-	console.log(`PR #${pull_number} is targetted at ${context.payload ? context.payload.base.ref : '[error: no payload]'} (or ${pr.base.sha})`);
+	console.log(`PR #${pull_number} is targetted at ${pr.base.ref} (${pr.base.sha})`);
 
 	const buildScript = getInput('build-script') || 'build';
 	const cwd = process.cwd();
