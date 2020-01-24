@@ -8,6 +8,9 @@ inputs:
   repo-token:
     description: 'The GITHUB_TOKEN secret'
     required: true
+  build-script:
+    description: 'The npm-script to run that builds your project'
+    default: 'build'
   compression:
     description: 'The compression algorithm to use: "gzip" or "brotli"'
   show-total:

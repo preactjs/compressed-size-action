@@ -1,6 +1,6 @@
 import path from 'path';
 import fs from 'fs';
-import { getInput, setFailed } from '@actions/core';
+import { getInput, setFailed, startGroup, endGroup, debug } from '@actions/core';
 import { GitHub, context } from '@actions/github';
 import { exec } from '@actions/exec';
 import SizePlugin from 'size-plugin-core';
@@ -19,10 +19,11 @@ async function fileExists(filename) {
 async function run(octokit, context) {
 	const { owner, repo, number: pull_number } = context.issue;
 
-	// console.log('context', context);
-	// console.log('payload', context.payload);
-
-	const pr = (await octokit.pulls.get({ owner, repo, pull_number })).data;
+	// const pr = (await octokit.pulls.get({ owner, repo, pull_number })).data;
+	const pr = context.payload.pull_request;
+	try {
+		debug('pr' + JSON.stringify(pr, null, 2));
+	} catch (e) {}
 
 	const plugin = new SizePlugin({
 		compression: getInput('compression'),
@@ -32,6 +33,7 @@ async function run(octokit, context) {
 
 	console.log(`PR #${pull_number} is targetted at ${context.payload ? context.payload.base.ref : '[error: no payload]'} (or ${pr.base.sha})`);
 
+	const buildScript = getInput('build-script') || 'build';
 	const cwd = process.cwd();
 
 	const yarnLock = await fileExists(path.resolve(cwd, 'yarn.lock'));
@@ -40,25 +42,30 @@ async function run(octokit, context) {
 	let npm = `npm`;
 	let installScript = `npm install`;
 	if (yarnLock) {
-		console.log('Detected yarn.lock, using Yarn for installation.');
 		installScript = npm = `yarn`;
 	}
 	else if (packageLock) {
-		console.log('Detected package-lock.json, using npm ci.');
 		installScript = `npm ci`;
 	}
 
-	console.log(`Installing using ${npm}`);
+	startGroup(`[current] Install Dependencies`);
+	console.log(`Installing using ${installScript}`)
 	await exec(installScript);
-	console.log('computing new sizes');
-	await exec(`${npm} run build`);
+	endGroup();
+
+	startGroup(`[current] Build using ${npm}`);
+	console.log(`Building using ${npm} run ${buildScript}`);
+	await exec(`${npm} run ${buildScript}`);
+	endGroup();
+
 	const newSizes = await plugin.readFromDisk(cwd);
 
+	startGroup(`[base] Checkout target branch`);
 	let baseRef;
 	try {
 		baseRef = context.payload.base.ref;
-		if (!baseRef) throw Error('missing context.payload.base.ref');
-		await exec(`git fetch -n origin ${context.payload.base.ref}`);
+		if (!baseRef) throw Error('missing context.payload.pull_request.base.ref');
+		await exec(`git fetch -n origin ${context.payload.pull_request.base.ref}`);
 		console.log('successfully fetched base.ref');
 	} catch (e) {
 		console.log('fetching base.ref failed', e.message);
@@ -83,15 +90,24 @@ async function run(octokit, context) {
 	catch (e) {
 		await exec(`git checkout ${pr.base.sha}`);
 	}
+	endGroup();
+
+	startGroup(`[base] Install Dependencies`);
 	await exec(installScript);
-	console.log('computing old sizes');
-	await exec(`${npm} run build`);
+	endGroup();
+
+	startGroup(`[current] Build using ${npm}`);
+	await exec(`${npm} run ${buildScript}`);
+	endGroup();
+
 	const oldSizes = await plugin.readFromDisk(cwd);
 
 	const diff = await plugin.getDiff(oldSizes, newSizes);
 
+	startGroup(`Size Differences:`);
 	const cliText = await plugin.printSizes(diff);
-	console.log('SIZE DIFFERENCES:\n\n' + cliText);
+	console.log(cliText);
+	endGroup();
 
 	const markdownDiff = diffTable(diff, {
 		collapseUnchanged: toBool(getInput('collapse-unchanged')),
@@ -109,6 +125,7 @@ async function run(octokit, context) {
 		body: markdownDiff + '\n\n<a href="https://github.com/preactjs/compressed-size-action"><sub>compressed-size-action</sub></a>'
 	};
 
+	startGroup(`Updating stats PR comment`);
 	let commentId;
 	try {
 		const comments = (await octokit.issues.listComments(commentInfo)).data;
@@ -142,6 +159,8 @@ async function run(octokit, context) {
 	if (!commentId) {
 		await octokit.issues.createComment(comment);
 	}
+
+	endGroup();
 
 	console.log('All done!');
 }
