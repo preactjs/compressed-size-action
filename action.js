@@ -8,6 +8,9 @@ import prettyBytes from 'pretty-bytes';
 async function run(octokit, context) {
 	const { owner, repo, number: pull_number } = context.issue;
 
+	console.log('context', context);
+	console.log('payload', context.payload);
+
 	const pr = (await octokit.pulls.get({ owner, repo, pull_number })).data;
 
 	const plugin = new SizePlugin({
@@ -17,10 +20,6 @@ async function run(octokit, context) {
 	});
 
 	console.log(`PR #${pull_number} is targetted at ${context.payload ? context.payload.base_ref : '[error: no payload]'} (or ${pr.base.sha})`);
-
-	try {
-		await exec(`git remote -v`);
-	} catch (e) {}
 
 	const cwd = process.cwd();
 
@@ -36,12 +35,12 @@ async function run(octokit, context) {
 		await exec(`git fetch -n origin ${context.payload.base_ref}`);
 		console.log('successfully fetched base_ref');
 	} catch (e) {
-		console.log('base_ref fetch failed', e.message);
+		console.log('fetching base_ref failed', e.message);
 		try {
 			await exec(`git fetch -n origin ${pr.base.sha}`);
 			console.log('successfully fetched base.sha');
 		} catch (e) {
-			console.log('base.sha fetch failed', e.message);
+			console.log('fetching base.sha failed', e.message);
 			try {
 				await exec(`git fetch -n`);
 			} catch (e) {
@@ -80,22 +79,16 @@ async function run(octokit, context) {
 
 	const comment = {
 		...commentInfo,
-		body: markdownDiff + '\n\n<sub>compressed-size-action</sub>'
+		body: markdownDiff + '\n\n<a href="https://github.com/preactjs/compressed-size-action"><sub>compressed-size-action</sub></a>'
 	};
 
 	let commentId;
 	try {
 		const comments = (await octokit.issues.listComments(commentInfo)).data;
 		for (let i=comments.length; i--; ) {
-			// TODO: check owner.login VS comment.user.login
-			console.log('checking comment', {
-				commentUserLogin: comments[i].user.login,
-				commentUserId: comments[i].user.id,
-				ownerLogin: context.user && context.user.login,
-				ownerId: context.user && context.user.id
-			});
-			if (/<sub>[\s\n]*compressed-size-action/.test(comments[i].body)) {
-				commentId = comments[i].id;
+			const c = comments[i];
+			if (c.user.type === 'Bot' && /<sub>[\s\n]*(compressed|gzip)-size-action/.test(c.body)) {
+				commentId = c.id;
 				break;
 			}
 		}
