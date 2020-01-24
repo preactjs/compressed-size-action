@@ -1,3 +1,5 @@
+import path from 'path';
+import fs from 'fs';
 import { getInput, setFailed } from '@actions/core';
 import { GitHub, context } from '@actions/github';
 import { exec } from '@actions/exec';
@@ -5,11 +7,20 @@ import SizePlugin from 'size-plugin-core';
 import prettyBytes from 'pretty-bytes';
 
 
+async function fileExists(filename) {
+	try {
+		await fs.promises.access(filename, fs.constants.F_OK);
+		return true;
+	} catch (e) {}
+	return false;
+}
+
+
 async function run(octokit, context) {
 	const { owner, repo, number: pull_number } = context.issue;
 
-	console.log('context', context);
-	console.log('payload', context.payload);
+	// console.log('context', context);
+	// console.log('payload', context.payload);
 
 	const pr = (await octokit.pulls.get({ owner, repo, pull_number })).data;
 
@@ -19,23 +30,38 @@ async function run(octokit, context) {
 		exclude: getInput('exclude') || '{**/*.map,**/node_modules/**}'
 	});
 
-	console.log(`PR #${pull_number} is targetted at ${context.payload ? context.payload.base_ref : '[error: no payload]'} (or ${pr.base.sha})`);
+	console.log(`PR #${pull_number} is targetted at ${context.payload ? context.payload.base.ref : '[error: no payload]'} (or ${pr.base.sha})`);
 
 	const cwd = process.cwd();
 
+	const yarnLock = await fileExists(path.resolve(cwd, 'yarn.lock'));
+	const packageLock = await fileExists(path.resolve(cwd, 'package-lock.json'));
+
+	let npm = `npm`;
+	let installScript = `npm install`;
+	if (yarnLock) {
+		console.log('Detected yarn.lock, using Yarn for installation.');
+		installScript = npm = `yarn`;
+	}
+	else if (packageLock) {
+		console.log('Detected package-lock.json, using npm ci.');
+		installScript = `npm ci`;
+	}
+
+	console.log(`Installing using ${npm}`);
+	await exec(installScript);
 	console.log('computing new sizes');
-	await exec(`npm ci`);
-	await exec(`npm run build`);
+	await exec(`${npm} run build`);
 	const newSizes = await plugin.readFromDisk(cwd);
 
 	let baseRef;
 	try {
-		baseRef = context.payload.base_ref;
-		if (!baseRef) throw Error('missing context.payload.base_ref');
-		await exec(`git fetch -n origin ${context.payload.base_ref}`);
-		console.log('successfully fetched base_ref');
+		baseRef = context.payload.base.ref;
+		if (!baseRef) throw Error('missing context.payload.base.ref');
+		await exec(`git fetch -n origin ${context.payload.base.ref}`);
+		console.log('successfully fetched base.ref');
 	} catch (e) {
-		console.log('fetching base_ref failed', e.message);
+		console.log('fetching base.ref failed', e.message);
 		try {
 			await exec(`git fetch -n origin ${pr.base.sha}`);
 			console.log('successfully fetched base.sha');
@@ -49,16 +75,17 @@ async function run(octokit, context) {
 		}
 	}
 
-	console.log('computing old sizes');
+	console.log('checking out and building base commit');
 	try {
-		if (!baseRef) throw Error('missing context.payload.base_ref');
+		if (!baseRef) throw Error('missing context.payload.base.ref');
 		await exec(`git checkout ${baseRef}`);
 	}
 	catch (e) {
 		await exec(`git checkout ${pr.base.sha}`);
 	}
-	await exec(`npm ci`);
-	await exec(`npm run build`);
+	await exec(installScript);
+	console.log('computing old sizes');
+	await exec(`${npm} run build`);
 	const oldSizes = await plugin.readFromDisk(cwd);
 
 	const diff = await plugin.getDiff(oldSizes, newSizes);
