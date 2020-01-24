@@ -142,6 +142,7 @@ async function run(octokit, context) {
 	}
 
 	if (commentId) {
+		console.log(`Updating previous comment #${commentId}`)
 		try {
 			await octokit.issues.updateComment({
 				...context.repo,
@@ -157,7 +158,18 @@ async function run(octokit, context) {
 
 	// no previous or edit failed
 	if (!commentId) {
-		await octokit.issues.createComment(comment);
+		console.log('Creating new comment');
+		try {
+			await octokit.issues.createComment(comment);
+		} catch (e) {
+			console.log('Error creating comment based on source owner, falling back to repo owner. ' + e.message);
+			await octokit.issues.createComment({
+				repo: pr.base.repo.name,
+				owner: pr.base.repo.owner.login,
+				issue_number: pull_number,
+				body: comment.body
+			});
+		}
 	}
 
 	endGroup();
