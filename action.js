@@ -144,7 +144,7 @@ function diffTable(files, { showTotal, collapseUnchanged, omitUnchanged }) {
 	}
 
 	if (unchanged) {
-		out = `\n<details><summary>ℹ️ <strong>View Unchanged</strong></summary>\n\n${outUnchanged}\n\n</details>\n\n`;
+		out += `\n<details><summary>ℹ️ <strong>View Unchanged</strong></summary>\n\n${outUnchanged}\n\n</details>\n\n`;
 	}
 
 	if (showTotal) {
