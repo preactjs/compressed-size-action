@@ -16,6 +16,12 @@ async function run(octokit, context) {
 		exclude: getInput('exclude') || '{**/*.map,**/node_modules/**}'
 	});
 
+	console.log(`PR #${pull_number} is targetted at ${context.payload ? context.payload.base_ref : '[error: no payload]'} (or ${pr.base.sha})`);
+
+	try {
+		await exec(`git remote -v`);
+	} catch (e) {}
+
 	const cwd = process.cwd();
 
 	console.log('computing new sizes');
@@ -23,20 +29,35 @@ async function run(octokit, context) {
 	await exec(`npm run build`);
 	const newSizes = await plugin.readFromDisk(cwd);
 
+	let baseRef;
 	try {
-		await exec(`git fetch -n origin ${pr.base.sha}`);
-		console.log('successfully fetched refspec');
+		baseRef = context.payload.base_ref;
+		if (!baseRef) throw Error('missing context.payload.base_ref');
+		await exec(`git fetch -n origin ${context.payload.base_ref}`);
+		console.log('successfully fetched base_ref');
 	} catch (e) {
-		console.log('refspec fetch failed', e.message);
+		console.log('base_ref fetch failed', e.message);
 		try {
-			await exec(`git fetch -n`);
+			await exec(`git fetch -n origin ${pr.base.sha}`);
+			console.log('successfully fetched base.sha');
 		} catch (e) {
-			console.log('fetch failed', e.message);
+			console.log('base.sha fetch failed', e.message);
+			try {
+				await exec(`git fetch -n`);
+			} catch (e) {
+				console.log('fetch failed', e.message);
+			}
 		}
 	}
 
 	console.log('computing old sizes');
-	await exec(`git checkout ${pr.base.sha}`);
+	try {
+		if (!baseRef) throw Error('missing context.payload.base_ref');
+		await exec(`git checkout ${baseRef}`);
+	}
+	catch (e) {
+		await exec(`git checkout ${pr.base.sha}`);
+	}
 	await exec(`npm ci`);
 	await exec(`npm run build`);
 	const oldSizes = await plugin.readFromDisk(cwd);
@@ -179,7 +200,9 @@ function iconForDifference(difference) {
 	return icon;
 }
 
-const toBool = v => /^(1|true|yes)$/.test(v);
+function toBool(v) {
+	return /^(1|true|yes)$/.test(v);
+}
 
 (async () => {
 	try {
