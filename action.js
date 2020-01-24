@@ -156,23 +156,41 @@ async function run(octokit, context) {
 		}
 	}
 
+	let outputRawMarkdown = false;
+
 	// no previous or edit failed
 	if (!commentId) {
 		console.log('Creating new comment');
 		try {
 			await octokit.issues.createComment(comment);
 		} catch (e) {
-			console.log('Error creating comment based on source owner, falling back to repo owner. ' + e.message);
-			await octokit.issues.createComment({
-				repo: pr.base.repo.name,
-				owner: pr.base.repo.owner.login,
-				issue_number: pull_number,
-				body: comment.body
-			});
+			console.log(`Error creating comment: ${e.message}`);
+			console.log(`Submitting a PR review comment instead...`);
+			try {
+				const issue = context.issue || pr;
+				await octokit.pulls.createReview({
+					owner: issue.owner,
+					repo: issue.repo,
+					pull_number: issue.number,
+					event: 'COMMENT',
+					body: comment.body
+				});
+			} catch (e) {
+				console.log('Error creating PR review.');
+				outputRawMarkdown = true;
+			}
 		}
 	}
-
 	endGroup();
+
+	if (outputRawMarkdown) {
+		console.log(`
+			Error: compressed-size-action was unable to comment on your PR.
+			This can happen for PR's originating from a fork without write permissions.
+			You can copy the size table directly into a comment using the markdown below:
+			\n\n${comment.body}\n\n
+		`.replace(/^(\t|  )+/gm, ''));
+	}
 
 	console.log('All done!');
 }
