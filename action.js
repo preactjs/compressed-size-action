@@ -24,6 +24,9 @@ async function run(octokit, context) {
 	try {
 		debug('pr' + JSON.stringify(pr, null, 2));
 	} catch (e) {}
+	if (!pr) {
+		throw Error('Could not retrieve PR information. Only "pull_request" triggered workflows are currently supported.');
+	}
 
 	const plugin = new SizePlugin({
 		compression: getInput('compression'),
