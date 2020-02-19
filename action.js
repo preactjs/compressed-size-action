@@ -42,7 +42,7 @@ async function run(octokit, context) {
 	let npm = `npm`;
 	let installScript = `npm install`;
 	if (yarnLock) {
-		installScript = npm = `yarn`;
+		installScript = npm = `yarn --frozen-lockfile`;
 	}
 	else if (packageLock) {
 		installScript = `npm ci`;
