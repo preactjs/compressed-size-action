@@ -40,12 +40,18 @@ async function run(octokit, context) {
 	const packageLock = await fileExists(path.resolve(cwd, 'package-lock.json'));
 
 	let npm = `npm`;
-	let installScript = `npm install`;
-	if (yarnLock) {
-		installScript = npm = `yarn`;
-	}
-	else if (packageLock) {
-		installScript = `npm ci`;
+	let installScript = getInput('install-script')
+	
+	if (!installScript) {
+		if (yarnLock) {
+			installScript = npm = `yarn`;
+		}
+		else if (packageLock) {
+			installScript = `npm ci`;
+		} 
+		else {
+			installScript = `npm install`;
+		}
 	}
 
 	startGroup(`[current] Install Dependencies`);
