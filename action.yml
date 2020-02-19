@@ -11,6 +11,9 @@ inputs:
   build-script:
     description: 'The npm-script to run that builds your project'
     default: 'build'
+  install-script:
+    description: 'The npm-script to run that installs your projects dependencies'
+    default: 'npm install'
   compression:
     description: 'The compression algorithm to use: "gzip" or "brotli"'
   show-total:
