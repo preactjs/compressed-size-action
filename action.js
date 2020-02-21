@@ -64,35 +64,20 @@ async function run(octokit, context) {
 	const newSizes = await plugin.readFromDisk(cwd);
 
 	startGroup(`[base] Checkout target branch`);
-	let baseRef;
 	try {
-		baseRef = context.payload.base.ref;
-		if (!baseRef) throw Error('missing context.payload.pull_request.base.ref');
-		await exec(`git fetch -n origin ${context.payload.pull_request.base.ref}`);
-		console.log('successfully fetched base.ref');
+		await exec(`git fetch -n origin ${pr.base.sha}`);
+		console.log('successfully fetched base.sha');
 	} catch (e) {
-		console.log('fetching base.ref failed', e.message);
+		console.log('fetching base.sha failed', e.message);
 		try {
-			await exec(`git fetch -n origin ${pr.base.sha}`);
-			console.log('successfully fetched base.sha');
+			await exec(`git fetch -n`);
 		} catch (e) {
-			console.log('fetching base.sha failed', e.message);
-			try {
-				await exec(`git fetch -n`);
-			} catch (e) {
-				console.log('fetch failed', e.message);
-			}
+			console.log('fetch failed', e.message);
 		}
 	}
 
 	console.log('checking out and building base commit');
-	try {
-		if (!baseRef) throw Error('missing context.payload.base.ref');
-		await exec(`git checkout ${baseRef}`);
-	}
-	catch (e) {
-		await exec(`git checkout ${pr.base.sha}`);
-	}
+	await exec(`git checkout ${pr.base.sha}`);
 	endGroup();
 
 	startGroup(`[base] Install Dependencies`);
