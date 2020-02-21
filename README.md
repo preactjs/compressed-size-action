@@ -31,3 +31,40 @@ jobs:
       with:
         repo-token: "${{ secrets.GITHUB_TOKEN }}"
 ```
+
+### Customizing the Build
+
+By default, `compressed-size-action` will try to build your PR by running the `"build"` [npm script](https://docs.npmjs.com/misc/scripts) in your `package.json`.
+
+If you need to perform some tasks after dependencies are installed but before building, you can use a "postinstall" npm script to do so. For example, in Lerna-based monorepo:
+
+```json
+{
+  "scripts": {
+    "postinstall": "lerna bootstrap",
+    "build": "lerna run build"
+  }
+}
+```
+
+It is also possible to define a `"prebuild"` npm script, which runs after `"postinstall"` but before `"build"`.
+
+You can also specify a completely different [npm script](https://docs.npmjs.com/misc/scripts) to run instead of the default (`"build"`). To do this, add a **`build-script` option** to your `yml` workflow:
+
+```diff
+name: Compressed Size
+
+on: [pull_request]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - uses: preactjs/compressed-size-action@v1
+      with:
+        repo-token: "${{ secrets.GITHUB_TOKEN }}"
++       build-script: "ci"
+```
