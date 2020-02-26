@@ -16,9 +16,13 @@ async function fileExists(filename) {
 }
 
 function stripHash(regex) {
-	return function(fileName) {
-		return fileName.replace(regex, '');
+	if (regex) {
+		return function(fileName) {
+			return fileName.replace(new RegExp(regex), '');
+		}
 	}
+
+	return undefined;
 }
 
 
