@@ -1,6 +1,6 @@
 # compressed-size-action
 
-A github action that reports changes in compressed file sizes on your PRs.
+A GitHub action that reports changes in compressed file sizes on your PRs.
 
 - Automatically uses `yarn` or `npm ci` when lockfiles are present
 - Builds your PR, then builds the target and compares between the two
