@@ -41,7 +41,7 @@ async function run(octokit, context) {
 
 	const plugin = new SizePlugin({
 		compression: getInput('compression'),
-		pattern: getInput('pattern') || '**/dist/*.js',
+		pattern: getInput('pattern') || '**/dist/**/*.js',
 		exclude: getInput('exclude') || '{**/*.map,**/node_modules/**}',
 		stripHash: stripHash(getInput('stripHash'))
 	});
