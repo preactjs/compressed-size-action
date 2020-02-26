@@ -15,6 +15,12 @@ async function fileExists(filename) {
 	return false;
 }
 
+function stripHash(regex) {
+	return function(fileName) {
+		return fileName.replace(regex, '');
+	}
+}
+
 
 async function run(octokit, context) {
 	const { owner, repo, number: pull_number } = context.issue;
@@ -31,7 +37,8 @@ async function run(octokit, context) {
 	const plugin = new SizePlugin({
 		compression: getInput('compression'),
 		pattern: getInput('pattern') || '**/dist/*.js',
-		exclude: getInput('exclude') || '{**/*.map,**/node_modules/**}'
+		exclude: getInput('exclude') || '{**/*.map,**/node_modules/**}',
+		stripHash: stripHash(getInput('stripHash'))
 	});
 
 	console.log(`PR #${pull_number} is targetted at ${pr.base.ref} (${pr.base.sha})`);
