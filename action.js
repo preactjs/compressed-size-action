@@ -17,6 +17,7 @@ async function fileExists(filename) {
 
 function stripHash(regex) {
 	if (regex) {
+		console.log(`Striping hash from build chunks using '${regex}' pattern.`);
 		return function(fileName) {
 			return fileName.replace(new RegExp(regex), '');
 		}
