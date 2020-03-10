@@ -163,24 +163,29 @@ async function run(octokit, context) {
 
 	// no previous or edit failed
 	if (!commentId) {
-		console.log('Creating new comment');
-		try {
-			await octokit.issues.createComment(comment);
-		} catch (e) {
-			console.log(`Error creating comment: ${e.message}`);
-			console.log(`Submitting a PR review comment instead...`);
+		const threshold = Number(getInput('delta-threshold'));
+		if (!isNaN(threshold) && Math.abs(diff.delta) < threshold) {
+			console.log(`Skipping comment creation because size delta ${Math.abs(diff.delta)} is less than configured threshold ${threshold}`);
+		} else {
+			console.log('Creating new comment');
 			try {
-				const issue = context.issue || pr;
-				await octokit.pulls.createReview({
-					owner: issue.owner,
-					repo: issue.repo,
-					pull_number: issue.number,
-					event: 'COMMENT',
-					body: comment.body
-				});
+				await octokit.issues.createComment(comment);
 			} catch (e) {
-				console.log('Error creating PR review.');
-				outputRawMarkdown = true;
+				console.log(`Error creating comment: ${e.message}`);
+				console.log(`Submitting a PR review comment instead...`);
+				try {
+					const issue = context.issue || pr;
+					await octokit.pulls.createReview({
+						owner: issue.owner,
+						repo: issue.repo,
+						pull_number: issue.number,
+						event: 'COMMENT',
+						body: comment.body
+					});
+				} catch (e) {
+					console.log('Error creating PR review.');
+					outputRawMarkdown = true;
+				}
 			}
 		}
 	}
