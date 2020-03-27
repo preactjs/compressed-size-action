@@ -88,10 +88,10 @@ async function run(octokit, context) {
 	console.log('checking out and building base commit');
 	try {
 		if (!baseRef) throw Error('missing context.payload.base.ref');
-		await exec(`git checkout ${baseRef}`);
+		await exec(`git reset --hard ${baseRef}`);
 	}
 	catch (e) {
-		await exec(`git checkout ${pr.base.sha}`);
+		await exec(`git reset --hard ${pr.base.sha}`);
 	}
 	endGroup();
 
