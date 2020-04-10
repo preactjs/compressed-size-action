@@ -99,7 +99,7 @@ async function run(octokit, context) {
 	await exec(installScript);
 	endGroup();
 
-	startGroup(`[current] Build using ${npm}`);
+	startGroup(`[base] Build using ${npm}`);
 	await exec(`${npm} run ${buildScript}`);
 	endGroup();
 
