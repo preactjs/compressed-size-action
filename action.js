@@ -43,7 +43,7 @@ async function run(octokit, context) {
 		compression: getInput('compression'),
 		pattern: getInput('pattern') || '**/dist/**/*.js',
 		exclude: getInput('exclude') || '{**/*.map,**/node_modules/**}',
-		stripHash: stripHash(getInput('stripHash'))
+		stripHash: stripHash(getInput('strip-hash'))
 	});
 
 	console.log(`PR #${pull_number} is targetted at ${pr.base.ref} (${pr.base.sha})`);
