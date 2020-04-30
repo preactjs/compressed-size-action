@@ -15,6 +15,17 @@ async function fileExists(filename) {
 	return false;
 }
 
+function stripHash(regex) {
+	if (regex) {
+		console.log(`Striping hash from build chunks using '${regex}' pattern.`);
+		return function(fileName) {
+			return fileName.replace(new RegExp(regex), '');
+		}
+	}
+
+	return undefined;
+}
+
 
 async function run(octokit, context) {
 	const { owner, repo, number: pull_number } = context.issue;
@@ -31,7 +42,8 @@ async function run(octokit, context) {
 	const plugin = new SizePlugin({
 		compression: getInput('compression'),
 		pattern: getInput('pattern') || '**/dist/**/*.js',
-		exclude: getInput('exclude') || '{**/*.map,**/node_modules/**}'
+		exclude: getInput('exclude') || '{**/*.map,**/node_modules/**}',
+		stripHash: stripHash(getInput('strip-hash'))
 	});
 
 	console.log(`PR #${pull_number} is targetted at ${pr.base.ref} (${pr.base.sha})`);
