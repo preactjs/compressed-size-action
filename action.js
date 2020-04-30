@@ -27,7 +27,7 @@ function stripHash(regex) {
 }
 
 
-async function run(octokit, context) {
+async function run(octokit, context, token) {
 	const { owner, repo, number: pull_number } = context.issue;
 
 	// const pr = (await octokit.pulls.get({ owner, repo, pull_number })).data;
@@ -129,74 +129,91 @@ async function run(octokit, context) {
 		omitUnchanged: toBool(getInput('omit-unchanged')),
 		showTotal: toBool(getInput('show-total'))
 	});
-
-	const commentInfo = {
-		...context.repo,
-		issue_number: pull_number
-	};
-
-	const comment = {
-		...commentInfo,
-		body: markdownDiff + '\n\n<a href="https://github.com/preactjs/compressed-size-action"><sub>compressed-size-action</sub></a>'
-	};
-
-	startGroup(`Updating stats PR comment`);
-	let commentId;
-	try {
-		const comments = (await octokit.issues.listComments(commentInfo)).data;
-		for (let i=comments.length; i--; ) {
-			const c = comments[i];
-			if (c.user.type === 'Bot' && /<sub>[\s\n]*(compressed|gzip)-size-action/.test(c.body)) {
-				commentId = c.id;
-				break;
-			}
-		}
-	}
-	catch (e) {
-		console.log('Error checking for previous comments: ' + e.message);
-	}
-
-	if (commentId) {
-		console.log(`Updating previous comment #${commentId}`)
-		try {
-			await octokit.issues.updateComment({
-				...context.repo,
-				comment_id: commentId,
-				body: comment.body
-			});
-		}
-		catch (e) {
-			console.log('Error editing previous comment: ' + e.message);
-			commentId = null;
-		}
-	}
-
+	
 	let outputRawMarkdown = false;
 
-	// no previous or edit failed
-	if (!commentId) {
-		console.log('Creating new comment');
-		try {
-			await octokit.issues.createComment(comment);
-		} catch (e) {
-			console.log(`Error creating comment: ${e.message}`);
-			console.log(`Submitting a PR review comment instead...`);
-			try {
-				const issue = context.issue || pr;
-				await octokit.pulls.createReview({
-					owner: issue.owner,
-					repo: issue.repo,
-					pull_number: issue.number,
-					event: 'COMMENT',
-					body: comment.body
-				});
-			} catch (e) {
-				console.log('Error creating PR review.');
-				outputRawMarkdown = true;
-			}
-		}
-	}
-	endGroup();
+	if (toBool(getInput('use-check')) {
+        if (token) {
+            const finish = await createCheck(octokit, context);
+            await finish({
+                conclusion: 'success',
+                output: {
+                    title: `Compressed Size Action`,
+                    summary: markdownDiff
+                }
+            });
+        }
+        else {
+            outputRawMarkdown = true;
+        }
+    }
+    else {
+        const commentInfo = {
+            ...context.repo,
+            issue_number: pull_number
+        };
+
+        const comment = {
+            ...commentInfo,
+            body: markdownDiff + '\n\n<a href="https://github.com/preactjs/compressed-size-action"><sub>compressed-size-action</sub></a>'
+        };
+
+        startGroup(`Updating stats PR comment`);
+        let commentId;
+        try {
+            const comments = (await octokit.issues.listComments(commentInfo)).data;
+            for (let i=comments.length; i--; ) {
+                const c = comments[i];
+                if (c.user.type === 'Bot' && /<sub>[\s\n]*(compressed|gzip)-size-action/.test(c.body)) {
+                    commentId = c.id;
+                    break;
+                }
+            }
+        }
+        catch (e) {
+            console.log('Error checking for previous comments: ' + e.message);
+        }
+
+        if (commentId) {
+            console.log(`Updating previous comment #${commentId}`)
+            try {
+                await octokit.issues.updateComment({
+                    ...context.repo,
+                    comment_id: commentId,
+                    body: comment.body
+                });
+            }
+            catch (e) {
+                console.log('Error editing previous comment: ' + e.message);
+                commentId = null;
+            }
+        }
+
+        // no previous or edit failed
+        if (!commentId) {
+            console.log('Creating new comment');
+            try {
+                await octokit.issues.createComment(comment);
+            } catch (e) {
+                console.log(`Error creating comment: ${e.message}`);
+                console.log(`Submitting a PR review comment instead...`);
+                try {
+                    const issue = context.issue || pr;
+                    await octokit.pulls.createReview({
+                        owner: issue.owner,
+                        repo: issue.repo,
+                        pull_number: issue.number,
+                        event: 'COMMENT',
+                        body: comment.body
+                    });
+                } catch (e) {
+                    console.log('Error creating PR review.');
+                    outputRawMarkdown = true;
+                }
+            }
+        }
+        endGroup();
+    }
 
 	if (outputRawMarkdown) {
 		console.log(`
@@ -209,6 +226,28 @@ async function run(octokit, context) {
 
 	console.log('All done!');
 }
+
+
+// create a check and return a function that updates (completes) it
+async function createCheck(octokit, context) {
+    const check = await octokit.checks.create({
+        ...context.repo,
+        name: 'Compressed Size',
+        head_sha: context.payload.pull_request.head.sha,
+        status: 'in_progress',
+    });
+
+    return async details => {
+        await octokit.checks.update({
+            ...context.repo,
+            check_run_id: check.data.id,
+            completed_at: new Date().toISOString(),
+            status: 'completed',
+            ...details
+        });
+    };
+}
+
 
 function diffTable(files, { showTotal, collapseUnchanged, omitUnchanged }) {
 	let out = `| Filename | Size | Change | |\n`;
@@ -292,7 +331,7 @@ function toBool(v) {
 	try {
 		const token = getInput('repo-token', { required: true });
 		const octokit = new GitHub(token);
-		await run(octokit, context);
+		await run(octokit, context, token);
 	} catch (e) {
 		setFailed(e.message);
 	}
