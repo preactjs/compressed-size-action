@@ -132,7 +132,17 @@ async function run(octokit, context, token) {
 	
 	let outputRawMarkdown = false;
 
-	if (toBool(getInput('use-check')) {
+	const commentInfo = {
+		...context.repo,
+		issue_number: pull_number
+	};
+
+	const comment = {
+		...commentInfo,
+		body: markdownDiff + '\n\n<a href="https://github.com/preactjs/compressed-size-action"><sub>compressed-size-action</sub></a>'
+	};
+
+	if (toBool(getInput('use-check'))) {
         if (token) {
             const finish = await createCheck(octokit, context);
             await finish({
@@ -148,16 +158,6 @@ async function run(octokit, context, token) {
         }
     }
     else {
-        const commentInfo = {
-            ...context.repo,
-            issue_number: pull_number
-        };
-
-        const comment = {
-            ...commentInfo,
-            body: markdownDiff + '\n\n<a href="https://github.com/preactjs/compressed-size-action"><sub>compressed-size-action</sub></a>'
-        };
-
         startGroup(`Updating stats PR comment`);
         let commentId;
         try {
