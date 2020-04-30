@@ -21,6 +21,10 @@ inputs:
     default: 'true'
   omit-unchanged:
     description: 'Exclude unchanged files from the sizes table entirely'
+  strip-hash:
+    description: 'A regular expression to remove hashes from filenames. Submatches are turned into asterisks if present, otherwise the whole match is removed.'
+  use-check:
+    description: 'Report status as a CI Check instead of using a comment [experimental]'
 runs:
   using: 'node12'
   main: 'index.js'
