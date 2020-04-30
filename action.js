@@ -19,7 +19,17 @@ function stripHash(regex) {
 	if (regex) {
 		console.log(`Striping hash from build chunks using '${regex}' pattern.`);
 		return function(fileName) {
-			return fileName.replace(new RegExp(regex), '');
+			return fileName.replace(new RegExp(regex), (str, ...hashes) => {
+				hashes = hashes.slice(0, -2).filter(c => c != null);
+				if (hashes.length) {
+					for (let i=0; i<hashes.length; i++) {
+						const hash = hashes[i] || '';
+						str = str.replace(hash, hash.replace(/./g, '*'));
+					}
+					return str;
+				}
+				return '';
+			});
 		}
 	}
 
