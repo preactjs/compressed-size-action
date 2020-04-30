@@ -21,6 +21,8 @@ inputs:
     default: 'true'
   omit-unchanged:
     description: 'Exclude unchanged files from the sizes table entirely'
+  delta-threshold:
+    description: 'Minimum absolute size change required as condition to report'
 runs:
   using: 'node12'
   main: 'index.js'
