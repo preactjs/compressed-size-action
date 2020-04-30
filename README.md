@@ -68,3 +68,21 @@ jobs:
         repo-token: "${{ secrets.GITHUB_TOKEN }}"
 +       build-script: "ci"
 ```
+
+### Dealing with hashed filenames
+
+A `strip-hash` option was added in `v2` that allows passing a custom Regular Expression pattern that will be used to remove hashes from filenames. The un-hashed filenames are used both for size comparison and display purposes.
+
+By default, the characters matched by the regex are removed from filenames.
+In the example below, a filename `foo.abcde.js` will be converted to `foo.js`:
+
+```yaml
+  strip-hash: "\\b\\w{5}\\."
+```
+
+This can be customized further using parens to create submatches, which mark where a hash occurs. When a submatch is detected, it will be replaced with asterisks. This is particularly useful when mix of hashed and unhashed filenames are present.
+In the example below, a filename `foo.abcde.chunk.js` will be converted to `foo.*****.chunk.js`:
+
+```yaml
+  strip-hash: "\\.(\\w{5})\\.chunk\\.js$"
+```
