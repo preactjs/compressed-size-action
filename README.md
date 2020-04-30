@@ -86,3 +86,13 @@ In the example below, a filename `foo.abcde.chunk.js` will be converted to `foo.
 ```yaml
   strip-hash: "\\.(\\w{5})\\.chunk\\.js$"
 ```
+
+### Increasing the required threshold
+
+By default, a file that's been changed by a single byte will be reported as changed. If you'd prefer to require a certain minimum threshold for a file to be changed, you can specify `minimum-change-threshold` in bytes:
+
+```yaml
+  minimum-change-threshold: 100
+```
+
+In the above example, a file with a delta of less than 100 bytes will be reported as unchanged.

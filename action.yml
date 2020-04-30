@@ -25,6 +25,9 @@ inputs:
     description: 'A regular expression to remove hashes from filenames. Submatches are turned into asterisks if present, otherwise the whole match is removed.'
   use-check:
     description: 'Report status as a CI Check instead of using a comment [experimental]'
+  minimum-change-threshold:
+    description: 'Consider files with changes below this threshold as unchanged. Specified in bytes.'
+    default: 1
 runs:
   using: 'node12'
   main: 'index.js'
