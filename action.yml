@@ -25,6 +25,12 @@ inputs:
     description: 'A regular expression to remove hashes from filenames. Submatches are turned into asterisks if present, otherwise the whole match is removed.'
   use-check:
     description: 'Report status as a CI Check instead of using a comment [experimental]'
+  pattern:
+    description: 'minimatch pattern of files to track'
+    default:  '**/dist/**/*.js'
+  exclude:
+    description: 'minimatch pattern of files NOT to track'
+    default: '{**/*.map,**/node_modules/**}'
 runs:
   using: 'node12'
   main: 'index.js'
