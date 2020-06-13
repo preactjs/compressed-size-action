@@ -28,6 +28,12 @@ inputs:
   minimum-change-threshold:
     description: 'Consider files with changes below this threshold as unchanged. Specified in bytes.'
     default: 1
+  pattern:
+    description: 'minimatch pattern of files to track'
+    default:  '**/dist/**/*.js'
+  exclude:
+    description: 'minimatch pattern of files NOT to track'
+    default: '{**/*.map,**/node_modules/**}'
 runs:
   using: 'node12'
   main: 'index.js'
