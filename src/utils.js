@@ -2,7 +2,7 @@ import fs from 'fs';
 import prettyBytes from 'pretty-bytes';
 
 /**
- *
+ * Check if a given file exists and can be accessed.
  * @param {string} filename
  */
 export async function fileExists(filename) {
@@ -14,7 +14,7 @@ export async function fileExists(filename) {
 }
 
 /**
- *
+ * Remove any matched hash patterns from a filename string.
  * @param {string=} regex
  * @returns {(((fileName: string) => string) | undefined)}
  */
@@ -40,7 +40,6 @@ export function stripHash(regex) {
 }
 
 /**
- *
  * @param {number} delta
  * @param {number} difference
  */
@@ -53,7 +52,6 @@ export function getDeltaText(delta, difference) {
 }
 
 /**
- *
  * @param {number} difference
  */
 export function iconForDifference(difference) {
@@ -77,13 +75,13 @@ export function iconForDifference(difference) {
  */
 
 /**
- *
+ * Create a Markdown table showing diff data
  * @param {Diff[]} files
  * @param {object} options
- * @param {boolean} options.showTotal
- * @param {boolean} options.collapseUnchanged
- * @param {boolean} options.omitUnchanged
- * @param {number} options.minimumChangeThreshold
+ * @param {boolean} [options.showTotal]
+ * @param {boolean} [options.collapseUnchanged]
+ * @param {boolean} [options.omitUnchanged]
+ * @param {number} [options.minimumChangeThreshold]
  */
 export function diffTable(files, { showTotal, collapseUnchanged, omitUnchanged, minimumChangeThreshold }) {
 	let out = `| Filename | Size | Change | |\n`;
@@ -138,7 +136,7 @@ export function diffTable(files, { showTotal, collapseUnchanged, omitUnchanged, 
 }
 
 /**
- *
+ * Convert a string "true"/"yes"/"1" argument value to a boolean
  * @param {string} v
  */
 export function toBool(v) {

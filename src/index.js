@@ -3,7 +3,7 @@ import { getInput, setFailed, startGroup, endGroup, debug } from '@actions/core'
 import { GitHub, context } from '@actions/github';
 import { exec } from '@actions/exec';
 import SizePlugin from 'size-plugin-core';
-import { fileExists, diffTable, toBool, stripHash } from './utils';
+import { fileExists, diffTable, toBool, stripHash } from './utils.js';
 
 
 async function run(octokit, context, token) {
@@ -13,7 +13,7 @@ async function run(octokit, context, token) {
 	const pr = context.payload.pull_request;
 	try {
 		debug('pr' + JSON.stringify(pr, null, 2));
-	} catch (e) {}
+	} catch (e) { }
 	if (!pr) {
 		throw Error('Could not retrieve PR information. Only "pull_request" triggered workflows are currently supported.');
 	}
@@ -109,7 +109,7 @@ async function run(octokit, context, token) {
 		showTotal: toBool(getInput('show-total')),
 		minimumChangeThreshold: parseInt(getInput('minimum-change-threshold'), 10)
 	});
-	
+
 	let outputRawMarkdown = false;
 
 	const commentInfo = {
@@ -123,77 +123,77 @@ async function run(octokit, context, token) {
 	};
 
 	if (toBool(getInput('use-check'))) {
-        if (token) {
-            const finish = await createCheck(octokit, context);
-            await finish({
-                conclusion: 'success',
-                output: {
-                    title: `Compressed Size Action`,
-                    summary: markdownDiff
-                }
-            });
-        }
-        else {
-            outputRawMarkdown = true;
-        }
-    }
-    else {
-        startGroup(`Updating stats PR comment`);
-        let commentId;
-        try {
-            const comments = (await octokit.issues.listComments(commentInfo)).data;
-            for (let i=comments.length; i--; ) {
-                const c = comments[i];
-                if (c.user.type === 'Bot' && /<sub>[\s\n]*(compressed|gzip)-size-action/.test(c.body)) {
-                    commentId = c.id;
-                    break;
-                }
-            }
-        }
-        catch (e) {
-            console.log('Error checking for previous comments: ' + e.message);
-        }
+		if (token) {
+			const finish = await createCheck(octokit, context);
+			await finish({
+				conclusion: 'success',
+				output: {
+					title: `Compressed Size Action`,
+					summary: markdownDiff
+				}
+			});
+		}
+		else {
+			outputRawMarkdown = true;
+		}
+	}
+	else {
+		startGroup(`Updating stats PR comment`);
+		let commentId;
+		try {
+			const comments = (await octokit.issues.listComments(commentInfo)).data;
+			for (let i = comments.length; i--;) {
+				const c = comments[i];
+				if (c.user.type === 'Bot' && /<sub>[\s\n]*(compressed|gzip)-size-action/.test(c.body)) {
+					commentId = c.id;
+					break;
+				}
+			}
+		}
+		catch (e) {
+			console.log('Error checking for previous comments: ' + e.message);
+		}
 
-        if (commentId) {
-            console.log(`Updating previous comment #${commentId}`)
-            try {
-                await octokit.issues.updateComment({
-                    ...context.repo,
-                    comment_id: commentId,
-                    body: comment.body
-                });
-            }
-            catch (e) {
-                console.log('Error editing previous comment: ' + e.message);
-                commentId = null;
-            }
-        }
+		if (commentId) {
+			console.log(`Updating previous comment #${commentId}`)
+			try {
+				await octokit.issues.updateComment({
+					...context.repo,
+					comment_id: commentId,
+					body: comment.body
+				});
+			}
+			catch (e) {
+				console.log('Error editing previous comment: ' + e.message);
+				commentId = null;
+			}
+		}
 
-        // no previous or edit failed
-        if (!commentId) {
-            console.log('Creating new comment');
-            try {
-                await octokit.issues.createComment(comment);
-            } catch (e) {
-                console.log(`Error creating comment: ${e.message}`);
-                console.log(`Submitting a PR review comment instead...`);
-                try {
-                    const issue = context.issue || pr;
-                    await octokit.pulls.createReview({
-                        owner: issue.owner,
-                        repo: issue.repo,
-                        pull_number: issue.number,
-                        event: 'COMMENT',
-                        body: comment.body
-                    });
-                } catch (e) {
-                    console.log('Error creating PR review.');
-                    outputRawMarkdown = true;
-                }
-            }
-        }
-        endGroup();
-    }
+		// no previous or edit failed
+		if (!commentId) {
+			console.log('Creating new comment');
+			try {
+				await octokit.issues.createComment(comment);
+			} catch (e) {
+				console.log(`Error creating comment: ${e.message}`);
+				console.log(`Submitting a PR review comment instead...`);
+				try {
+					const issue = context.issue || pr;
+					await octokit.pulls.createReview({
+						owner: issue.owner,
+						repo: issue.repo,
+						pull_number: issue.number,
+						event: 'COMMENT',
+						body: comment.body
+					});
+				} catch (e) {
+					console.log('Error creating PR review.');
+					outputRawMarkdown = true;
+				}
+			}
+		}
+		endGroup();
+	}
 
 	if (outputRawMarkdown) {
 		console.log(`
@@ -210,22 +210,22 @@ async function run(octokit, context, token) {
 
 // create a check and return a function that updates (completes) it
 async function createCheck(octokit, context) {
-    const check = await octokit.checks.create({
-        ...context.repo,
-        name: 'Compressed Size',
-        head_sha: context.payload.pull_request.head.sha,
-        status: 'in_progress',
-    });
+	const check = await octokit.checks.create({
+		...context.repo,
+		name: 'Compressed Size',
+		head_sha: context.payload.pull_request.head.sha,
+		status: 'in_progress',
+	});
 
-    return async details => {
-        await octokit.checks.update({
-            ...context.repo,
-            check_run_id: check.data.id,
-            completed_at: new Date().toISOString(),
-            status: 'completed',
-            ...details
-        });
-    };
+	return async details => {
+		await octokit.checks.update({
+			...context.repo,
+			check_run_id: check.data.id,
+			completed_at: new Date().toISOString(),
+			status: 'completed',
+			...details
+		});
+	};
 }
 
 (async () => {
