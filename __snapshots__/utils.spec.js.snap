@@ -1,0 +1,111 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`diffTable 1`] = `
+"**Size Change:** +9 B (0%) 
+
+**Total Size:** 4.8 kB
+
+| Filename | Size | Change | |
+|:--- |:---:|:---:|:---:|
+| \`one.js\` | 5 kB | +2.5 kB (50%) | 🆘 |
+| \`two.js\` | -5 kB | -2.5 kB (50%) | 🆘 |
+| \`four.js\` | 4.5 kB | +9 B (0%) |  |
+
+<details><summary>ℹ️ <strong>View Unchanged</strong></summary>
+
+| Filename | Size | Change | |
+|:--- |:---:|:---:|:---:|
+| \`three.js\` | 300 B | 0 B |  |
+
+
+</details>
+
+"
+`;
+
+exports[`diffTable 2`] = `
+"| Filename | Size | Change | |
+|:--- |:---:|:---:|:---:|
+| \`one.js\` | 5 kB | +2.5 kB (50%) | 🆘 |
+| \`two.js\` | -5 kB | -2.5 kB (50%) | 🆘 |
+| \`four.js\` | 4.5 kB | +9 B (0%) |  |
+
+<details><summary>ℹ️ <strong>View Unchanged</strong></summary>
+
+| Filename | Size | Change | |
+|:--- |:---:|:---:|:---:|
+| \`three.js\` | 300 B | 0 B |  |
+
+
+</details>
+
+"
+`;
+
+exports[`diffTable 3`] = `
+"**Size Change:** +9 B (0%) 
+
+**Total Size:** 4.8 kB
+
+| Filename | Size | Change | |
+|:--- |:---:|:---:|:---:|
+| \`one.js\` | 5 kB | +2.5 kB (50%) | 🆘 |
+| \`two.js\` | -5 kB | -2.5 kB (50%) | 🆘 |
+| \`three.js\` | 300 B | 0 B |  |
+| \`four.js\` | 4.5 kB | +9 B (0%) |  |
+"
+`;
+
+exports[`diffTable 4`] = `
+"**Size Change:** +9 B (0%) 
+
+**Total Size:** 4.8 kB
+
+| Filename | Size | Change | |
+|:--- |:---:|:---:|:---:|
+| \`one.js\` | 5 kB | +2.5 kB (50%) | 🆘 |
+| \`two.js\` | -5 kB | -2.5 kB (50%) | 🆘 |
+| \`four.js\` | 4.5 kB | +9 B (0%) |  |
+"
+`;
+
+exports[`diffTable 5`] = `
+"**Size Change:** +9 B (0%) 
+
+**Total Size:** 4.8 kB
+
+| Filename | Size | Change | |
+|:--- |:---:|:---:|:---:|
+| \`one.js\` | 5 kB | +2.5 kB (50%) | 🆘 |
+| \`two.js\` | -5 kB | -2.5 kB (50%) | 🆘 |
+
+<details><summary>ℹ️ <strong>View Unchanged</strong></summary>
+
+| Filename | Size | Change | |
+|:--- |:---:|:---:|:---:|
+| \`three.js\` | 300 B | 0 B |  |
+| \`four.js\` | 4.5 kB | +9 B (0%) |  |
+
+
+</details>
+
+"
+`;
+
+exports[`diffTable 6`] = `
+"**Size Change:** 0 B 
+
+**Total Size:** 300 B
+
+
+<details><summary>ℹ️ <strong>View Unchanged</strong></summary>
+
+| Filename | Size | Change | |
+|:--- |:---:|:---:|:---:|
+| \`three.js\` | 300 B | 0 B |  |
+
+
+</details>
+
+"
+`;
