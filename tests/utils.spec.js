@@ -1,4 +1,4 @@
-import { toBool, getDeltaText, iconForDifference, diffTable, fileExists, stripHash } from './utils';
+import { toBool, getDeltaText, iconForDifference, diffTable, fileExists, stripHash } from '../src/utils.js';
 
 test('toBool', () => {
 	expect(toBool('1')).toBe(true);
