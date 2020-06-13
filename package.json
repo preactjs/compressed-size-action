@@ -20,6 +20,9 @@
     "pretty-bytes": "^5.3.0",
     "size-plugin-core": "0.0.9"
   },
+  "jest": {
+    "testEnvironment": "node"
+  },
   "babel": {
     "presets": [
       [
