@@ -90,6 +90,27 @@ exports[`diffTable 5`] = `
 exports[`diffTable 6`] = `
 "**Size Change:** 0 B 
 
+**Total Size:** 4.8 kB
+
+
+
+<details><summary>ℹ️ <strong>View Unchanged</strong></summary>
+
+| Filename | Size | Change |
+| :--- | :---: | :---: |
+| \`one.js\` | 5 kB | 0 B |
+| \`two.js\` | -5 kB | 0 B |
+| \`three.js\` | 300 B | 0 B |
+| \`four.js\` | 4.5 kB | 0 B |
+
+</details>
+
+"
+`;
+
+exports[`diffTable 7`] = `
+"**Size Change:** 0 B 
+
 **Total Size:** 300 B
 
 
