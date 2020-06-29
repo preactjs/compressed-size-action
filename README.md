@@ -5,6 +5,7 @@ A GitHub action that reports changes in compressed file sizes on your PRs.
 - Automatically uses `yarn` or `npm ci` when lockfiles are present
 - Builds your PR, then builds the target and compares between the two
 - Doesn't upload anything or rely on centralized storage
+- Supports [custom build scripts](#customizing-the-build) and [file patterns](#customizing-the-list-of-files)
 
 <img width="396" src="https://user-images.githubusercontent.com/105127/73027546-a0176a80-3e01-11ea-887b-7326ee289893.png">
 
@@ -27,7 +28,7 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - uses: preactjs/compressed-size-action@v1
+    - uses: preactjs/compressed-size-action@v2
       with:
         repo-token: "${{ secrets.GITHUB_TOKEN }}"
 ```
@@ -63,10 +64,40 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - uses: preactjs/compressed-size-action@v1
+    - uses: preactjs/compressed-size-action@v2
       with:
         repo-token: "${{ secrets.GITHUB_TOKEN }}"
 +       build-script: "ci"
+```
+
+### Customizing the list of files
+
+`compressed-size-action` defaults to tracking the size of all JavaScript files within `dist/` directories - anywhere in your repository, not just at the root. You can change the list of files to be tracked and reported using the `pattern` and `exclude` options, both of which are [minimatch patterns](https://github.com/motemen/minimatch-cheat-sheet/blob/master/README.md):
+
+```diff
+name: Compressed Size
+on: [pull_request]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: preactjs/compressed-size-action@v2
+      with:
+        repo-token: "${{ secrets.GITHUB_TOKEN }}"
++       pattern: "./build-output/**/*.{js,css,html,json}"
++       exclude: "{./build-output/manifest.json,**/*.map,**/node_modules/**}"
+```
+
+Files are collected by finding matches for `pattern`, then any of those that match `exclude` are ignored. For that reason, most project don't need to modify `exclude`. The default values for `pattern` and `exclude` are as follows:
+
+```yaml
+with:
+  # Any JS files anywhere within a dist directory:
+  pattern: "**/dist/**/*.js"
+
+  # Always ignore SourceMaps and node_modules:
+  exclude: "{**/*.map,**/node_modules/**}"
 ```
 
 ### Dealing with hashed filenames
