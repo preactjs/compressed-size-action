@@ -94,6 +94,9 @@ async function run(octokit, context, token) {
 	await exec(`${npm} run ${buildScript}`);
 	endGroup();
 
+        // In case the build step alters a JSON-file, ....
+        await exec(`git reset --hard`);
+
 	const oldSizes = await plugin.readFromDisk(cwd);
 
 	const diff = await plugin.getDiff(oldSizes, newSizes);
