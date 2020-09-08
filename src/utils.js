@@ -14,6 +14,19 @@ export async function fileExists(filename) {
 }
 
 /**
+ * Check if a given regex pattern exists in the filename provided.
+ * @param {string=} regex
+ * @param {string} filename
+ * @returns {boolean}
+ */
+export async function patternExistsInFile(regex, filename) {
+	const content = await fs.promises.readFile(filename, { encoding: 'utf8' });
+	const match = content.match(regex);
+	 
+	return !!match;
+}
+
+/**
  * Remove any matched hash patterns from a filename string.
  * @param {string=} regex
  * @returns {(((fileName: string) => string) | undefined)}
