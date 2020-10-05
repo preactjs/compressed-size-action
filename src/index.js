@@ -51,6 +51,9 @@ async function run(octokit, context, token) {
 	console.log(`Building using ${npm} run ${buildScript}`);
 	await exec(`${npm} run ${buildScript}`);
 	endGroup();
+	
+	// In case the build step alters a JSON-file, ....
+        await exec(`git reset --hard`);
 
 	const newSizes = await plugin.readFromDisk(cwd);
 
@@ -93,6 +96,9 @@ async function run(octokit, context, token) {
 	startGroup(`[base] Build using ${npm}`);
 	await exec(`${npm} run ${buildScript}`);
 	endGroup();
+
+        // In case the build step alters a JSON-file, ....
+        await exec(`git reset --hard`);
 
 	const oldSizes = await plugin.readFromDisk(cwd);
 
