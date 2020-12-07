@@ -12,7 +12,8 @@ jobs:
       - run: npm ci
       - run: npm run build
       - run: npm test
-      - uses: ./
+      - name: Report Compressed Size
+        uses: ./
         with:
           repo-token: "${{ secrets.GITHUB_TOKEN }}"
           pattern: index.js
