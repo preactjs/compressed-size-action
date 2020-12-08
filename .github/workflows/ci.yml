@@ -1,0 +1,19 @@
+name: CI
+
+on: pull_request
+
+jobs:
+  build_test:
+    name: Build & Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+      - run: npm ci
+      - run: npm run build
+      - run: npm test
+      - name: Report Compressed Size
+        uses: ./
+        with:
+          repo-token: "${{ secrets.GITHUB_TOKEN }}"
+          pattern: index.js
