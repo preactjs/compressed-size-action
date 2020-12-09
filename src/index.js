@@ -27,25 +27,10 @@ async function run(octokit, context, token) {
 
 	console.log(`PR #${pull_number} is targetted at ${pr.base.ref} (${pr.base.sha})`);
 
+	await installDependencies(`current`);
+
 	const buildScript = getInput('build-script') || 'build';
 	const cwd = process.cwd();
-
-	const yarnLock = await fileExists(path.resolve(cwd, 'yarn.lock'));
-	const packageLock = await fileExists(path.resolve(cwd, 'package-lock.json'));
-
-	let npm = `npm`;
-	let installScript = `npm install`;
-	if (yarnLock) {
-		installScript = npm = `yarn --frozen-lockfile`;
-	}
-	else if (packageLock) {
-		installScript = `npm ci`;
-	}
-
-	startGroup(`[current] Install Dependencies`);
-	console.log(`Installing using ${installScript}`)
-	await exec(installScript);
-	endGroup();
 
 	startGroup(`[current] Build using ${npm}`);
 	console.log(`Building using ${npm} run ${buildScript}`);
@@ -89,9 +74,7 @@ async function run(octokit, context, token) {
 	}
 	endGroup();
 
-	startGroup(`[base] Install Dependencies`);
-	await exec(installScript);
-	endGroup();
+	await installDependencies(`base`);
 
 	startGroup(`[base] Build using ${npm}`);
 	await exec(`${npm} run ${buildScript}`);
@@ -232,6 +215,30 @@ async function createCheck(octokit, context) {
 			...details
 		});
 	};
+}
+
+async function installDependencies(revision) {
+	const cwd = process.cwd();
+	if (await fileExists(path.resolve(cwd, '.pnp.js'))) {
+		return; // No need to install dependencies in projects with PnP enabled.
+	}
+
+	const yarnLock = await fileExists(path.resolve(cwd, 'yarn.lock'));
+	const packageLock = await fileExists(path.resolve(cwd, 'package-lock.json'));
+
+	let npm = `npm`;
+	let installScript = `npm install`;
+	if (yarnLock) {
+		installScript = npm = `yarn --frozen-lockfile`;
+	}
+	else if (packageLock) {
+		installScript = `npm ci`;
+	}
+
+	startGroup(`[${revision}] Install Dependencies`);
+	console.log(`Installing using ${installScript}`)
+	await exec(installScript);
+	endGroup();
 }
 
 (async () => {
