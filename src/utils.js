@@ -45,19 +45,22 @@ export function stripHash(regex) {
  */
 export function getDeltaText(delta, originalSize) {
 	let deltaText = (delta > 0 ? '+' : '') + prettyBytes(delta);
-	if (originalSize === 0) {
+	if (Math.abs(delta) === 0) {
+		// only print size
+	} else if (originalSize === 0) {
 		deltaText += ` (new file)`;
 	} else if (originalSize === -delta) {
 		deltaText += ` (removed)`;
-	} else if (Math.abs(delta) > 0) {
+	} else {
 		const percentage = Math.round((delta / originalSize) * 100);
-		deltaText += ` (${delta > 0 ? '+' : ''}${percentage}%)`;
+		deltaText += ` (${percentage > 0 ? '+' : ''}${percentage}%)`;
 	}
 	return deltaText;
 }
 
 /**
- * @param {number} difference
+ * @param {number} delta
+ * @param {number} originalSize
  */
 export function iconForDifference(delta, originalSize) {
 	if (originalSize === 0) return '🆕';
