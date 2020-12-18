@@ -51,7 +51,7 @@ export function getDeltaText(delta, originalSize) {
 		deltaText += ` (removed)`;
 	} else if (Math.abs(delta) > 0) {
 		const percentage = Math.round((delta / originalSize) * 100);
-		deltaText += ` (${delta > 0 ? '+' : '-'}${Math.abs(percentage)}%)`;
+		deltaText += ` (${delta > 0 ? '+' : ''}${percentage}%)`;
 	}
 	return deltaText;
 }
@@ -60,7 +60,7 @@ export function getDeltaText(delta, originalSize) {
  * @param {number} difference
  */
 export function iconForDifference(delta, originalSize) {
-	if (originalSize === 0) return '🆘';
+	if (originalSize === 0) return '🆕';
 
 	const percentage = Math.round((delta / originalSize) * 100);
 	if (percentage >= 50) return '🆘';
