@@ -17,6 +17,8 @@ async function run(octokit, context, token) {
 		throw Error('Could not retrieve PR information. Only "pull_request" triggered workflows are currently supported.');
 	}
 
+	if (getInput('cwd')) process.chdir(getInput('cwd'));
+
 	const plugin = new SizePlugin({
 		compression: getInput('compression'),
 		pattern: getInput('pattern') || '**/dist/**/*.js',
