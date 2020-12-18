@@ -7,6 +7,8 @@ import { fileExists, diffTable, toBool, stripHash } from './utils.js';
 
 async function run(octokit, context, token) {
 	const { owner, repo, number: pull_number } = context.issue;
+	
+	console.log('HELLO');
 
 	// const pr = (await octokit.pulls.get({ owner, repo, pull_number })).data;
 	const pr = context.payload.pull_request;
