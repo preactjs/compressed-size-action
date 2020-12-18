@@ -11,13 +11,16 @@ test('toBool', () => {
 });
 
 test('getDeltaText', () => {
-	expect(getDeltaText(5000, 25.5)).toBe('+5 kB (25.5%)');
-	expect(getDeltaText(-5000, -25.5)).toBe('-5 kB (25.5%)');
+	expect(getDeltaText(5000, 20000)).toBe('+5 kB (+25%)');
+	expect(getDeltaText(-5000, 20000)).toBe('-5 kB (-25%)');
+	expect(getDeltaText(210, 0)).toBe('+210 B (new file)');
 	expect(getDeltaText(0, 0)).toBe('0 B');
 });
 
 test('iconForDifference', () => {
-	expect(iconForDifference(0)).toBe('');
+	expect(iconForDifference(0, 5000)).toBe('');
+	expect(iconForDifference(5500, 5000)).toBe('🆘');
+	expect(iconForDifference(-550, 5000)).toBe('👏');
 });
 
 test('diffTable', () => {
@@ -29,7 +32,7 @@ test('diffTable', () => {
 		},
 		{
 			filename: 'two.js',
-			size: -5000,
+			size: 5000,
 			delta: -2500
 		},
 		{
