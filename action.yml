@@ -34,6 +34,8 @@ inputs:
   exclude:
     description: 'minimatch pattern of files NOT to track'
     default: '{**/*.map,**/node_modules/**}'
+  cwd:
+    description: 'A custom working directory to execute the action in relative to repo root (defaults to .)'
 runs:
   using: 'node12'
   main: 'index.js'
