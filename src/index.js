@@ -1,10 +1,9 @@
 import path from 'path';
 import { getInput, setFailed, startGroup, endGroup, debug } from '@actions/core';
-import { GitHub, context } from '@actions/github';
+import { context, getOctokit } from '@actions/github';
 import { exec } from '@actions/exec';
 import SizePlugin from 'size-plugin-core';
 import { fileExists, diffTable, toBool, stripHash } from './utils.js';
-
 
 async function run(octokit, context, token) {
 	const { owner, repo, number: pull_number } = context.issue;
@@ -17,6 +16,8 @@ async function run(octokit, context, token) {
 	if (!pr) {
 		throw Error('Could not retrieve PR information. Only "pull_request" triggered workflows are currently supported.');
 	}
+
+	if (getInput('cwd')) process.chdir(getInput('cwd'));
 
 	const plugin = new SizePlugin({
 		compression: getInput('compression'),
@@ -51,6 +52,9 @@ async function run(octokit, context, token) {
 	console.log(`Building using ${npm} run ${buildScript}`);
 	await exec(`${npm} run ${buildScript}`);
 	endGroup();
+	
+	// In case the build step alters a JSON-file, ....
+	await exec(`git reset --hard`);
 
 	const newSizes = await plugin.readFromDisk(cwd);
 
@@ -93,6 +97,9 @@ async function run(octokit, context, token) {
 	startGroup(`[base] Build using ${npm}`);
 	await exec(`${npm} run ${buildScript}`);
 	endGroup();
+
+	// In case the build step alters a JSON-file, ....
+	await exec(`git reset --hard`);
 
 	const oldSizes = await plugin.readFromDisk(cwd);
 
@@ -231,7 +238,7 @@ async function createCheck(octokit, context) {
 (async () => {
 	try {
 		const token = getInput('repo-token', { required: true });
-		const octokit = new GitHub(token);
+		const octokit = getOctokit(token);
 		await run(octokit, context, token);
 	} catch (e) {
 		setFailed(e.message);
