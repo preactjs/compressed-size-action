@@ -127,3 +127,12 @@ By default, a file that's been changed by a single byte will be reported as chan
 ```
 
 In the above example, a file with a delta of less than 100 bytes will be reported as unchanged.
+
+### Compression
+
+By default, files are compared after gzip compression, but it's possible to use other compression algorithms (`gzip/brotli/none`) or disable the compression. 
+
+```yaml
+  compression: 'none'
+```
+
