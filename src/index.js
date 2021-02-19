@@ -31,8 +31,8 @@ async function run(octokit, context, token) {
 	const buildScript = getInput('build-script') || 'build';
 	const cwd = process.cwd();
 
-	const yarnLock = await fileExists(path.resolve(cwd, 'yarn.lock'));
-	const packageLock = await fileExists(path.resolve(cwd, 'package-lock.json'));
+	let yarnLock = await fileExists(path.resolve(cwd, 'yarn.lock'));
+	let packageLock = await fileExists(path.resolve(cwd, 'package-lock.json'));
 
 	let npm = `npm`;
 	let installScript = `npm install`;
@@ -91,6 +91,18 @@ async function run(octokit, context, token) {
 	endGroup();
 
 	startGroup(`[base] Install Dependencies`);
+
+	let yarnLock = await fileExists(path.resolve(cwd, 'yarn.lock'));
+	let packageLock = await fileExists(path.resolve(cwd, 'package-lock.json'));
+	
+	if (yarnLock) {
+		installScript = npm = `yarn --frozen-lockfile`;
+	}
+	else if (packageLock) {
+		installScript = `npm ci`;
+	}
+
+	console.log(`Installing using ${installScript}`)
 	await exec(installScript);
 	endGroup();
 
