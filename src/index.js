@@ -92,8 +92,8 @@ async function run(octokit, context, token) {
 
 	startGroup(`[base] Install Dependencies`);
 
-	let yarnLock = await fileExists(path.resolve(cwd, 'yarn.lock'));
-	let packageLock = await fileExists(path.resolve(cwd, 'package-lock.json'));
+	yarnLock = await fileExists(path.resolve(cwd, 'yarn.lock'));
+	packageLock = await fileExists(path.resolve(cwd, 'package-lock.json'));
 	
 	if (yarnLock) {
 		installScript = npm = `yarn --frozen-lockfile`;
