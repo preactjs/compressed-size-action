@@ -249,7 +249,7 @@ async function createCheck(octokit, context) {
 
 (async () => {
 	try {
-		const token = getInput('repo-token', { required: true });
+		const token = getInput('repo-token');
 		const octokit = getOctokit(token);
 		await run(octokit, context, token);
 	} catch (e) {

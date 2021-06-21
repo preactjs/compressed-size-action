@@ -29,8 +29,6 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - uses: preactjs/compressed-size-action@v2
-      with:
-        repo-token: "${{ secrets.GITHUB_TOKEN }}"
 ```
 
 ### Customizing the Build
@@ -66,7 +64,6 @@ jobs:
     - uses: actions/checkout@v2
     - uses: preactjs/compressed-size-action@v2
       with:
-        repo-token: "${{ secrets.GITHUB_TOKEN }}"
 +       build-script: "ci"
 ```
 
@@ -84,7 +81,6 @@ jobs:
     - uses: actions/checkout@v2
     - uses: preactjs/compressed-size-action@v2
       with:
-        repo-token: "${{ secrets.GITHUB_TOKEN }}"
 +       pattern: "./build-output/**/*.{js,css,html,json}"
 +       exclude: "{./build-output/manifest.json,**/*.map,**/node_modules/**}"
 ```
