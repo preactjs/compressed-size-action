@@ -79,7 +79,7 @@ export function iconForDifference(delta, originalSize) {
 
 /**
  * Create a Markdown table from text rows
- * @param {string[]} rows
+ * @param {string[][]} rows
  */
 function markdownTable(rows) {
 	if (rows.length == 0) {
