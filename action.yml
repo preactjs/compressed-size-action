@@ -8,6 +8,8 @@ inputs:
   repo-token:
     description: 'The GITHUB_TOKEN secret'
     required: true
+  clean-script:
+    description: 'An npm-script that cleans/resets state between branch builds'
   build-script:
     description: 'The npm-script to run that builds your project'
     default: 'build'
