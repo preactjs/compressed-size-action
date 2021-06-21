@@ -29,8 +29,6 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - uses: preactjs/compressed-size-action@v2
-      with:
-        repo-token: "${{ secrets.GITHUB_TOKEN }}"
 ```
 
 ### Customizing the Build
@@ -66,7 +64,6 @@ jobs:
     - uses: actions/checkout@v2
     - uses: preactjs/compressed-size-action@v2
       with:
-        repo-token: "${{ secrets.GITHUB_TOKEN }}"
 +       build-script: "ci"
 ```
 
@@ -114,7 +111,6 @@ jobs:
     - uses: actions/checkout@v2
     - uses: preactjs/compressed-size-action@v2
       with:
-        repo-token: "${{ secrets.GITHUB_TOKEN }}"
 +       pattern: "./build-output/**/*.{js,css,html,json}"
 +       exclude: "{./build-output/manifest.json,**/*.map,**/node_modules/**}"
 ```
@@ -157,3 +153,12 @@ By default, a file that's been changed by a single byte will be reported as chan
 ```
 
 In the above example, a file with a delta of less than 100 bytes will be reported as unchanged.
+
+### Compression
+
+By default, files are compared after gzip compression, but it's possible to use other compression algorithms (`gzip/brotli/none`) or disable the compression. 
+
+```yaml
+  compression: 'none'
+```
+
