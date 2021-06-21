@@ -97,7 +97,7 @@ function markdownTable(rows) {
 	let columnLength = firstRow.length;
 
 	// Hide `Change` column if they are all `0 B`
-	if (columnLength === 3 &rows.every(columns => columns[2] === '0 B')) {
+	if (columnLength === 3 && rows.every(columns => columns[2] === '0 B')) {
 		columnLength -= 1;
 		for (const columns of rows) {
 			columns.pop();
