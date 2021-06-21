@@ -90,6 +90,13 @@ async function run(octokit, context, token) {
 	}
 	endGroup();
 
+	const cleanScript = getInput('clean-script');
+	if (cleanScript) {
+		startGroup(`[base] Cleanup via ${npm} run ${cleanScript}`);
+		await exec(`${npm} run ${cleanScript}`);
+		endGroup();
+	}
+
 	startGroup(`[base] Install Dependencies`);
 
 	yarnLock = await fileExists(path.resolve(cwd, 'yarn.lock'));

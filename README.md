@@ -67,6 +67,36 @@ jobs:
 +       build-script: "ci"
 ```
 
+#### Clean up state between builds
+
+For repositories or custom monorepo setups where files are modified in ways that are not reset by `npm ci && npm run build`, it may be necessary to define a custom "clean" script. This script resets any file modifications after the upstream (`target`) build ends and your PR code (`HEAD`) is checked out, but before installation of npm dependencies for `HEAD`:
+
+```diff
+name: Compressed Size
+on: [pull_request]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: preactjs/compressed-size-action@v2
+      with:
+        repo-token: "${{ secrets.GITHUB_TOKEN }}"
++       clean-script: "clean"
+```
+
+```jsonc
+// package.json
+{
+  "scripts": {
+    // example - a simple nested node_modules setup:
+    "postinstall": "cd packages && npm i",
+    // between the two builds, we need to delete the inner node_modules:
+    "clean": "rm -rf packages/node_modules"
+  }
+}
+```
+
 ### Customizing the list of files
 
 `compressed-size-action` defaults to tracking the size of all JavaScript files within `dist/` directories - anywhere in your repository, not just at the root. You can change the list of files to be tracked and reported using the `pattern` and `exclude` options, both of which are [minimatch patterns](https://github.com/motemen/minimatch-cheat-sheet/blob/master/README.md):
