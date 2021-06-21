@@ -98,7 +98,7 @@ jobs:
     "clean": "rm -rf packages/node_modules"
   }
 }
-````
+```
 
 ### Customizing the list of files
 
