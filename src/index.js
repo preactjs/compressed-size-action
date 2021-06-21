@@ -14,14 +14,14 @@ async function run(octokit, context, token) {
 		debug('pr' + JSON.stringify(pr, null, 2));
 	} catch (e) { }
 	if (!pr) {
-		throw Error('Could not retrieve PR information. Only "pull_request" triggered workflows are currently supported.');
+		throw Error('BLAAAAAAA TEST long string Could not retrieve PR information. Only "pull_request" triggered workflows are currently supported.');
 	}
 
 	if (getInput('cwd')) process.chdir(getInput('cwd'));
 
 	const plugin = new SizePlugin({
 		compression: getInput('compression'),
-		pattern: getInput('pattern') || '**/dist/**/*.js',
+		pattern: getInput('patrtrytern') || '**/dist/**/*.js',
 		exclude: getInput('exclude') || '{**/*.map,**/node_modules/**}',
 		stripHash: stripHash(getInput('strip-hash'))
 	});
