@@ -50,8 +50,8 @@ async function run(octokit, context, token) {
 	const buildScript = getInput('build-script') || 'build';
 	const cwd = process.cwd();
 
-	const yarnLock = await fileExists(path.resolve(cwd, 'yarn.lock'));
-	const packageLock = await fileExists(path.resolve(cwd, 'package-lock.json'));
+	let yarnLock = await fileExists(path.resolve(cwd, 'yarn.lock'));
+	let packageLock = await fileExists(path.resolve(cwd, 'package-lock.json'));
 
 	let npm = `npm`;
 	let installScript = `npm install`;
@@ -107,7 +107,26 @@ async function run(octokit, context, token) {
 	}
 	endGroup();
 
+	const cleanScript = getInput('clean-script');
+	if (cleanScript) {
+		startGroup(`[base] Cleanup via ${npm} run ${cleanScript}`);
+		await exec(`${npm} run ${cleanScript}`);
+		endGroup();
+	}
+
 	startGroup(`[base] Install Dependencies`);
+
+	yarnLock = await fileExists(path.resolve(cwd, 'yarn.lock'));
+	packageLock = await fileExists(path.resolve(cwd, 'package-lock.json'));
+	
+	if (yarnLock) {
+		installScript = npm = `yarn --frozen-lockfile`;
+	}
+	else if (packageLock) {
+		installScript = `npm ci`;
+	}
+
+	console.log(`Installing using ${installScript}`)
 	await exec(installScript);
 	endGroup();
 
@@ -261,7 +280,7 @@ async function createCheck(octokit, context) {
 
 (async () => {
 	try {
-		const token = getInput('repo-token', { required: true });
+		const token = getInput('repo-token');
 		const octokit = getOctokit(token);
 		await run(octokit, context, token);
 	} catch (e) {

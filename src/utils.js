@@ -79,7 +79,7 @@ export function iconForDifference(delta, originalSize) {
 
 /**
  * Create a Markdown table from text rows
- * @param {string[]} rows
+ * @param {string[][]} rows
  */
 function markdownTable(rows) {
 	if (rows.length == 0) {
@@ -94,7 +94,16 @@ function markdownTable(rows) {
 	}
 
 	const [firstRow] = rows;
-	const columnLength = firstRow.length;
+	let columnLength = firstRow.length;
+
+	// Hide `Change` column if they are all `0 B`
+	if (columnLength === 3 && rows.every(columns => columns[2] === '0 B')) {
+		columnLength -= 1;
+		for (const columns of rows) {
+			columns.pop();
+		}
+	}
+
 	if (columnLength === 0) {
 		return '';
 	}
