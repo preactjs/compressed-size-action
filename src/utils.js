@@ -20,7 +20,7 @@ export async function fileExists(filename) {
  */
 export function stripHash(regex) {
 	if (regex) {
-		console.log(`Striping hash from build chunks using '${regex}' pattern.`);
+		console.log(`Stripping hash from build chunks using '${regex}' pattern.`);
 		return function (fileName) {
 			return fileName.replace(new RegExp(regex), (str, ...hashes) => {
 				hashes = hashes.slice(0, -2).filter((c) => c != null);
