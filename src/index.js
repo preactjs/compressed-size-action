@@ -12,7 +12,7 @@ import { fileExists, diffTable, toBool, stripHash } from './utils.js';
  * @param {ActionContext} context 
  * @param {string} token 
  */
-async function run(octokit, context, token) {
+async function run(octokit, context, token, privateConfig) {
 	const { owner, repo, number: pull_number } = context.issue;
 
 	// const pr = (await octokit.pulls.get({ owner, repo, pull_number })).data;
@@ -55,6 +55,9 @@ async function run(octokit, context, token) {
 
 	let npm = `npm`;
 	let installScript = `npm install`;
+	if(privateConfig) {
+		exec(privateConfig)
+	}
 	if (yarnLock) {
 		installScript = npm = `yarn --frozen-lockfile`;
 	}
@@ -118,7 +121,9 @@ async function run(octokit, context, token) {
 
 	yarnLock = await fileExists(path.resolve(cwd, 'yarn.lock'));
 	packageLock = await fileExists(path.resolve(cwd, 'package-lock.json'));
-	
+	if(privateConfig) {
+		exec(privateConfig)
+	}
 	if (yarnLock) {
 		installScript = npm = `yarn --frozen-lockfile`;
 	}
@@ -282,7 +287,8 @@ async function createCheck(octokit, context) {
 	try {
 		const token = getInput('repo-token');
 		const octokit = getOctokit(token);
-		await run(octokit, context, token);
+		const privateConfig = getInput('private-config')
+		await run(octokit, context, token, privateConfig);
 	} catch (e) {
 		setFailed(e.message);
 	}
