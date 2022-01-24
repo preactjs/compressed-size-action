@@ -285,9 +285,9 @@ async function createCheck(octokit, context) {
 
 (async () => {
 	try {
-		const token = getInput('repo-token') || process.env.REPO_TOKEN;
+		const token = getInput('repo-token')
 		const octokit = getOctokit(token);
-		const privateConfig = getInput('private-config') || process.env.PRIVATE_CONFIG
+		const privateConfig = getInput('private-config')
 		await run(octokit, context, token, privateConfig);
 	} catch (e) {
 		setFailed(e.message);
