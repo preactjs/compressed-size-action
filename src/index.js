@@ -55,9 +55,7 @@ async function run(octokit, context, token, privateConfig) {
 
 	let npm = `npm`;
 	let installScript = `npm install`;
-	if(privateConfig) {
-		exec(privateConfig)
-	}
+	exec(`git config --global --add url."https://${token}:x-oauth-basic@github.com/manabie-com".insteadOf "https://github.com/manabie-com"`)
 	if (yarnLock) {
 		installScript = npm = `yarn --frozen-lockfile`;
 	}
@@ -121,9 +119,7 @@ async function run(octokit, context, token, privateConfig) {
 
 	yarnLock = await fileExists(path.resolve(cwd, 'yarn.lock'));
 	packageLock = await fileExists(path.resolve(cwd, 'package-lock.json'));
-	if(privateConfig) {
-		exec(privateConfig)
-	}
+	exec(`git config --global --add url."https://${token}:x-oauth-basic@github.com/manabie-com".insteadOf "https://github.com/manabie-com"`)
 	if (yarnLock) {
 		installScript = npm = `yarn --frozen-lockfile`;
 	}
@@ -287,7 +283,6 @@ async function createCheck(octokit, context) {
 	try {
 		const token = getInput('repo-token')
 		const octokit = getOctokit(token);
-		const privateConfig = getInput('private-config')
 		await run(octokit, context, token, privateConfig);
 	} catch (e) {
 		setFailed(e.message);
