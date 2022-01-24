@@ -283,7 +283,7 @@ async function createCheck(octokit, context) {
 	try {
 		const token = getInput('repo-token')
 		const octokit = getOctokit(token);
-		await run(octokit, context, token, privateConfig);
+		await run(octokit, context, token);
 	} catch (e) {
 		setFailed(e.message);
 	}
