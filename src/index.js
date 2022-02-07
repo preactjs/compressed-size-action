@@ -58,7 +58,7 @@ async function run(octokit, context, token, privateConfig) {
 	const cwd = process.cwd();
 	let yarnLock = await fileExists(path.resolve(cwd, 'yarn.lock'));
 	let packageLock = await fileExists(path.resolve(cwd, 'package-lock.json'));
-	
+
 	let npm = `npm`;
 	let installScript = `npm install`;
 	exec(`git config --global --add url."https://${token}:x-oauth-basic@github.com/manabie-com".insteadOf "https://github.com/manabie-com"`)
@@ -132,10 +132,10 @@ async function run(octokit, context, token, privateConfig) {
 
 	const oldSizes = await pluginTarget.readFromDisk(cwd);
 
-	const diff = await plugin.getDiff(oldSizes, newSizes);
+	const diff = await pluginTarget.getDiff(oldSizes, newSizes);
 
 	startGroup(`Size Differences:`);
-	const cliText = await plugin.printSizes(diff);
+	const cliText = await pluginTarget.printSizes(diff);
 	console.log(cliText);
 	endGroup();
 
