@@ -1,4 +1,5 @@
 import path from 'path';
+import fs from 'fs';
 import { getInput, setFailed, startGroup, endGroup, debug } from '@actions/core';
 import { context, getOctokit } from '@actions/github';
 import { exec } from '@actions/exec';
@@ -38,26 +39,18 @@ async function run(octokit, context, token, privateConfig) {
 		);
 	}
 
-	if (getInput('cwd')) process.chdir(getInput('cwd'));
-
-	const pluginCurrent = new SizePlugin({
+	const plugin = new SizePlugin({
 		compression: getInput('compression'),
-		pattern: getInput('current-branch-pattern') || '**/dist/**/*.{js,mjs,cjs}',
-		exclude: getInput('current-branch-exclude') || '{**/*.map,**/node_modules/**}',
-		stripHash: stripHash(getInput('strip-hash'))
-	});
-
-	const pluginTarget = new SizePlugin({
-		compression: getInput('compression'),
-		pattern: getInput('target-branch-pattern') || '**/dist/**/*.{js,mjs,cjs}',
-		exclude: getInput('target-branch-pattern') || '{**/*.map,**/node_modules/**}',
+		pattern: getInput('pattern') || '**/dist/**/*.{js,mjs,cjs}',
+		exclude: getInput('exclude') || '{**/*.map,**/node_modules/**}',
 		stripHash: stripHash(getInput('strip-hash'))
 	});
 
 	const buildScript = getInput('build-script') || 'build';
-	const cwd = process.cwd();
-	let yarnLock = await fileExists(path.resolve(cwd, 'yarn.lock'));
-	let packageLock = await fileExists(path.resolve(cwd, 'package-lock.json'));
+	
+	console.log(`current dir ${process.cwd()}`)
+	let yarnLock = await fileExists(path.resolve(process.cwd(), 'yarn.lock'));
+	let packageLock = await fileExists(path.resolve(process.cwd(), 'package-lock.json'));
 
 	let npm = `npm`;
 	let installScript = `npm install`;
@@ -68,7 +61,18 @@ async function run(octokit, context, token, privateConfig) {
 	else if (packageLock) {
 		installScript = `npm ci`;
 	}
-	const newSizes = await pluginCurrent.readFromDisk(cwd);
+	const newSizes = await plugin.readFromDisk(process.cwd());
+
+	const workDir = getInput('cwd')
+	if (!fs.existsSync(workDir)){
+		fs.mkdirSync(workDir);
+		process.chdir(workDir)
+		console.log(`change dir to ${workDir}`)
+	} else {
+		process.chdir(workDir)
+		console.log(`change dir to ${workDir}`)
+	}
+	console.log(`current dir ${process.cwd()}`)
 
 	startGroup(`[base] Checkout target branch`);
 	try {
@@ -109,8 +113,8 @@ async function run(octokit, context, token, privateConfig) {
 
 	startGroup(`[base] Install Dependencies`);
 
-	yarnLock = await fileExists(path.resolve(cwd, 'yarn.lock'));
-	packageLock = await fileExists(path.resolve(cwd, 'package-lock.json'));
+	yarnLock = await fileExists(path.resolve(process.cwd(), 'yarn.lock'));
+	packageLock = await fileExists(path.resolve(process.cwd(), 'package-lock.json'));
 	exec(`git config --global --add url."https://${token}:x-oauth-basic@github.com/manabie-com".insteadOf "https://github.com/manabie-com"`)
 	if (yarnLock) {
 		installScript = npm = `yarn --frozen-lockfile`;
@@ -130,12 +134,12 @@ async function run(octokit, context, token, privateConfig) {
 	// In case the build step alters a JSON-file, ....
 	await exec(`git reset --hard`);
 
-	const oldSizes = await pluginTarget.readFromDisk(cwd);
+	const oldSizes = await plugin.readFromDisk(process.cwd());
 
-	const diff = await pluginTarget.getDiff(oldSizes, newSizes);
+	const diff = await plugin.getDiff(oldSizes, newSizes);
 
 	startGroup(`Size Differences:`);
-	const cliText = await pluginTarget.printSizes(diff);
+	const cliText = await plugin.printSizes(diff);
 	console.log(cliText);
 	endGroup();
 
