@@ -56,6 +56,9 @@ async function run(octokit, context, token, privateConfig) {
 
 	const buildScript = getInput('build-script') || 'build';
 	const cwd = process.cwd();
+	let yarnLock = await fileExists(path.resolve(cwd, 'yarn.lock'));
+	let packageLock = await fileExists(path.resolve(cwd, 'package-lock.json'));
+	
 	let npm = `npm`;
 	let installScript = `npm install`;
 	exec(`git config --global --add url."https://${token}:x-oauth-basic@github.com/manabie-com".insteadOf "https://github.com/manabie-com"`)
