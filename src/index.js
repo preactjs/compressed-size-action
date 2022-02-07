@@ -40,43 +40,24 @@ async function run(octokit, context, token, privateConfig) {
 
 	if (getInput('cwd')) process.chdir(getInput('cwd'));
 
-	const plugin = new SizePlugin({
+	const pluginCurrent = new SizePlugin({
 		compression: getInput('compression'),
-		pattern: getInput('pattern') || '**/dist/**/*.{js,mjs,cjs}',
-		exclude: getInput('exclude') || '{**/*.map,**/node_modules/**}',
+		pattern: getInput('current-branch-pattern') || '**/dist/**/*.{js,mjs,cjs}',
+		exclude: getInput('current-branch-exclude') || '{**/*.map,**/node_modules/**}',
+		stripHash: stripHash(getInput('strip-hash'))
+	});
+
+	const pluginTarget = new SizePlugin({
+		compression: getInput('compression'),
+		pattern: getInput('base-branch-pattern') || '**/dist/**/*.{js,mjs,cjs}',
+		exclude: getInput('base-branch-exclude') || '{**/*.map,**/node_modules/**}',
 		stripHash: stripHash(getInput('strip-hash'))
 	});
 
 	const buildScript = getInput('build-script') || 'build';
 	const cwd = process.cwd();
 
-	let yarnLock = await fileExists(path.resolve(cwd, 'yarn.lock'));
-	let packageLock = await fileExists(path.resolve(cwd, 'package-lock.json'));
-
-	let npm = `npm`;
-	let installScript = `npm install`;
-	exec(`git config --global --add url."https://${token}:x-oauth-basic@github.com/manabie-com".insteadOf "https://github.com/manabie-com"`)
-	if (yarnLock) {
-		installScript = npm = `yarn --frozen-lockfile`;
-	}
-	else if (packageLock) {
-		installScript = `npm ci`;
-	}
-
-	startGroup(`[current] Install Dependencies`);
-	console.log(`Installing using ${installScript}`)
-	await exec(installScript);
-	endGroup();
-
-	startGroup(`[current] Build using ${npm}`);
-	console.log(`Building using ${npm} run ${buildScript}`);
-	await exec(`${npm} run ${buildScript}`);
-	endGroup();
-	
-	// In case the build step alters a JSON-file, ....
-	await exec(`git reset --hard`);
-
-	const newSizes = await plugin.readFromDisk(cwd);
+	const newSizes = await pluginCurrent.readFromDisk(cwd);
 
 	startGroup(`[base] Checkout target branch`);
 	try {
@@ -138,7 +119,7 @@ async function run(octokit, context, token, privateConfig) {
 	// In case the build step alters a JSON-file, ....
 	await exec(`git reset --hard`);
 
-	const oldSizes = await plugin.readFromDisk(cwd);
+	const oldSizes = await pluginTarget.readFromDisk(cwd);
 
 	const diff = await plugin.getDiff(oldSizes, newSizes);
 
