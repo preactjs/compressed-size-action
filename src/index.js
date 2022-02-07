@@ -49,8 +49,8 @@ async function run(octokit, context, token, privateConfig) {
 
 	const pluginTarget = new SizePlugin({
 		compression: getInput('compression'),
-		pattern: getInput('base-branch-pattern') || '**/dist/**/*.{js,mjs,cjs}',
-		exclude: getInput('base-branch-exclude') || '{**/*.map,**/node_modules/**}',
+		pattern: getInput('target-branch-pattern') || '**/dist/**/*.{js,mjs,cjs}',
+		exclude: getInput('target-branch-pattern') || '{**/*.map,**/node_modules/**}',
 		stripHash: stripHash(getInput('strip-hash'))
 	});
 
