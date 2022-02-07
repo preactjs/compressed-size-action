@@ -56,7 +56,15 @@ async function run(octokit, context, token, privateConfig) {
 
 	const buildScript = getInput('build-script') || 'build';
 	const cwd = process.cwd();
-
+	let npm = `npm`;
+	let installScript = `npm install`;
+	exec(`git config --global --add url."https://${token}:x-oauth-basic@github.com/manabie-com".insteadOf "https://github.com/manabie-com"`)
+	if (yarnLock) {
+		installScript = npm = `yarn --frozen-lockfile`;
+	}
+	else if (packageLock) {
+		installScript = `npm ci`;
+	}
 	const newSizes = await pluginCurrent.readFromDisk(cwd);
 
 	startGroup(`[base] Checkout target branch`);
