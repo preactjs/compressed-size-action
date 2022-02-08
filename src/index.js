@@ -61,7 +61,10 @@ async function run(octokit, context, token, privateConfig) {
 	else if (packageLock) {
 		installScript = `npm ci`;
 	}
+	console.log("get new sizes")
 	const newSizes = await plugin.readFromDisk(process.cwd());
+	console.log("new size:")
+	console.log(newSizes)
 
 	const workDir = getInput('cwd')
 	if (!fs.existsSync(workDir)){
@@ -133,9 +136,10 @@ async function run(octokit, context, token, privateConfig) {
 
 	// In case the build step alters a JSON-file, ....
 	await exec(`git reset --hard`);
-
+	console.log("get old sizes")
 	const oldSizes = await plugin.readFromDisk(process.cwd());
-
+	console.log("old sizes:")
+	console,log(oldSizes)
 	const diff = await plugin.getDiff(oldSizes, newSizes);
 
 	startGroup(`Size Differences:`);
