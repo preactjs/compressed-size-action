@@ -57,10 +57,12 @@ async function run(octokit, context, token) {
 	let packageManager = `npm`;
 	let installScript = `npm install`;
 	if (yarnLock) {
-		installScript = packageManager = `yarn --frozen-lockfile`;
+		installScript = `yarn --frozen-lockfile`;
+		packageManager = `yarn`
 	}
 	else if (pnpmLock) {
 		installScript = `pnpm install --frozen-lockfile`;
+		packageManager = `pnpm`
 	}
 	else if (packageLock) {
 		installScript = `npm ci`;
@@ -125,10 +127,12 @@ async function run(octokit, context, token) {
 	packageLock = await fileExists(path.resolve(cwd, 'package-lock.json'));
 
 	if (yarnLock) {
-		installScript = packageManager = `yarn --frozen-lockfile`;
+		installScript = `yarn --frozen-lockfile`;
+		packageManager = `yarn`
 	}
 	else if (pnpmLock) {
 		installScript = `pnpm install --frozen-lockfile`;
+		packageManager = `pnpm`
 	}
 	else if (packageLock) {
 		installScript = `npm ci`;
