@@ -54,10 +54,10 @@ async function run(octokit, context, token) {
 	let pnpmLock = await fileExists(path.resolve(cwd, 'pnpm-lock.yaml'));
 	let packageLock = await fileExists(path.resolve(cwd, 'package-lock.json'));
 
-	let npm = `npm`;
+	let packageManager = `npm`;
 	let installScript = `npm install`;
 	if (yarnLock) {
-		installScript = npm = `yarn --frozen-lockfile`;
+		installScript = packageManager = `yarn --frozen-lockfile`;
 	}
 	else if (pnpmLock) {
 		installScript = `pnpm install --frozen-lockfile`;
@@ -71,9 +71,9 @@ async function run(octokit, context, token) {
 	await exec(installScript);
 	endGroup();
 
-	startGroup(`[current] Build using ${npm}`);
-	console.log(`Building using ${npm} run ${buildScript}`);
-	await exec(`${npm} run ${buildScript}`);
+	startGroup(`[current] Build using ${packageManager}`);
+	console.log(`Building using ${packageManager} run ${buildScript}`);
+	await exec(`${packageManager} run ${buildScript}`);
 	endGroup();
 
 	// In case the build step alters a JSON-file, ....
@@ -113,8 +113,8 @@ async function run(octokit, context, token) {
 
 	const cleanScript = getInput('clean-script');
 	if (cleanScript) {
-		startGroup(`[base] Cleanup via ${npm} run ${cleanScript}`);
-		await exec(`${npm} run ${cleanScript}`);
+		startGroup(`[base] Cleanup via ${packageManager} run ${cleanScript}`);
+		await exec(`${packageManager} run ${cleanScript}`);
 		endGroup();
 	}
 
@@ -125,7 +125,7 @@ async function run(octokit, context, token) {
 	packageLock = await fileExists(path.resolve(cwd, 'package-lock.json'));
 
 	if (yarnLock) {
-		installScript = npm = `yarn --frozen-lockfile`;
+		installScript = packageManager = `yarn --frozen-lockfile`;
 	}
 	else if (pnpmLock) {
 		installScript = `pnpm install --frozen-lockfile`;
@@ -138,8 +138,8 @@ async function run(octokit, context, token) {
 	await exec(installScript);
 	endGroup();
 
-	startGroup(`[base] Build using ${npm}`);
-	await exec(`${npm} run ${buildScript}`);
+	startGroup(`[base] Build using ${packageManager}`);
+	await exec(`${packageManager} run ${buildScript}`);
 	endGroup();
 
 	// In case the build step alters a JSON-file, ....
