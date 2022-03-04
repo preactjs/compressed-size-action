@@ -20,6 +20,22 @@
     "pretty-bytes": "^5.4.1",
     "size-plugin-core": "0.0.9"
   },
+  "prettier": {
+    "useTabs": true,
+    "singleQuote": true,
+    "trailingComma": "none",
+    "printWidth": 100,
+    "overrides": [
+      {
+        "files": [
+          "*.json"
+        ],
+        "options": {
+          "useTabs": false
+        }
+      }
+    ]
+  },
   "jest": {
     "testEnvironment": "node"
   },
