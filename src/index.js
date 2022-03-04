@@ -18,20 +18,20 @@ async function run(octokit, context, token) {
 	// const pr = (await octokit.pulls.get({ owner, repo, pull_number })).data;
 	try {
 		debug('pr' + JSON.stringify(context.payload, null, 2));
-	} catch (e) { }
+	} catch (e) {}
 
 	let baseSha, baseRef;
-	if (context.eventName == "push") {
+	if (context.eventName == 'push') {
 		baseSha = context.payload.before;
 		baseRef = context.payload.ref;
 
-		console.log(`Pushed new commit on top of ${baseRef} (${baseSha})`)
-	} else if (context.eventName == "pull_request" || context.eventName == 'pull_request_target') {
+		console.log(`Pushed new commit on top of ${baseRef} (${baseSha})`);
+	} else if (context.eventName == 'pull_request' || context.eventName == 'pull_request_target') {
 		const pr = context.payload.pull_request;
 		baseSha = pr.base.sha;
 		baseRef = pr.base.ref;
 
-		console.log(`PR #${pull_number} is targeted at ${baseRef} (${baseRef})`)
+		console.log(`PR #${pull_number} is targeted at ${baseRef} (${baseRef})`);
 	} else {
 		throw new Error(
 			`Unsupported eventName in github.context: ${context.eventName}. Only "pull_request", "pull_request_target", and "push" triggered workflows are currently supported.`
@@ -54,26 +54,26 @@ async function run(octokit, context, token) {
 	let pnpmLock = await fileExists(path.resolve(cwd, 'pnpm-lock.yaml'));
 	let packageLock = await fileExists(path.resolve(cwd, 'package-lock.json'));
 
-	let npm = `npm`;
-	let installScript = `npm install`;
+	let packageManager = 'npm';
+	let installScript = 'npm install';
 	if (yarnLock) {
-		installScript = npm = `yarn --frozen-lockfile`;
-	}
-	else if (pnpmLock) {
-		installScript = `pnpm install --frozen-lockfile`;
-	}
-	else if (packageLock) {
-		installScript = `npm ci`;
+		installScript = 'yarn --frozen-lockfile';
+		packageManager = 'yarn';
+	} else if (pnpmLock) {
+		installScript = 'pnpm install --frozen-lockfile';
+		packageManager = 'pnpm';
+	} else if (packageLock) {
+		installScript = 'npm ci';
 	}
 
 	startGroup(`[current] Install Dependencies`);
-	console.log(`Installing using ${installScript}`)
+	console.log(`Installing using ${installScript}`);
 	await exec(installScript);
 	endGroup();
 
-	startGroup(`[current] Build using ${npm}`);
-	console.log(`Building using ${npm} run ${buildScript}`);
-	await exec(`${npm} run ${buildScript}`);
+	startGroup(`[current] Build using ${packageManager}`);
+	console.log(`Building using ${packageManager} run ${buildScript}`);
+	await exec(`${packageManager} run ${buildScript}`);
 	endGroup();
 
 	// In case the build step alters a JSON-file, ....
@@ -105,16 +105,15 @@ async function run(octokit, context, token) {
 	try {
 		if (!baseRef) throw Error('missing context.payload.base.ref');
 		await exec(`git reset --hard ${baseRef}`);
-	}
-	catch (e) {
+	} catch (e) {
 		await exec(`git reset --hard ${baseSha}`);
 	}
 	endGroup();
 
 	const cleanScript = getInput('clean-script');
 	if (cleanScript) {
-		startGroup(`[base] Cleanup via ${npm} run ${cleanScript}`);
-		await exec(`${npm} run ${cleanScript}`);
+		startGroup(`[base] Cleanup via ${packageManager} run ${cleanScript}`);
+		await exec(`${packageManager} run ${cleanScript}`);
 		endGroup();
 	}
 
@@ -124,22 +123,24 @@ async function run(octokit, context, token) {
 	pnpmLock = await fileExists(path.resolve(cwd, 'pnpm-lock.yaml'));
 	packageLock = await fileExists(path.resolve(cwd, 'package-lock.json'));
 
+	packageManager = 'npm';
+	installScript = 'npm install';
 	if (yarnLock) {
-		installScript = npm = `yarn --frozen-lockfile`;
-	}
-	else if (pnpmLock) {
+		installScript = `yarn --frozen-lockfile`;
+		packageManager = `yarn`;
+	} else if (pnpmLock) {
 		installScript = `pnpm install --frozen-lockfile`;
-	}
-	else if (packageLock) {
+		packageManager = `pnpm`;
+	} else if (packageLock) {
 		installScript = `npm ci`;
 	}
 
-	console.log(`Installing using ${installScript}`)
+	console.log(`Installing using ${installScript}`);
 	await exec(installScript);
 	endGroup();
 
-	startGroup(`[base] Build using ${npm}`);
-	await exec(`${npm} run ${buildScript}`);
+	startGroup(`[base] Build using ${packageManager}`);
+	await exec(`${packageManager} run ${buildScript}`);
 	endGroup();
 
 	// In case the build step alters a JSON-file, ....
@@ -170,14 +171,15 @@ async function run(octokit, context, token) {
 
 	const comment = {
 		...commentInfo,
-		body: markdownDiff + '\n\n<a href="https://github.com/preactjs/compressed-size-action"><sub>compressed-size-action</sub></a>'
+		body:
+			markdownDiff +
+			'\n\n<a href="https://github.com/preactjs/compressed-size-action"><sub>compressed-size-action</sub></a>'
 	};
 
 	if (context.eventName !== 'pull_request' && context.eventName !== 'pull_request_target') {
 		console.log('No PR associated with this action run. Not posting a check or comment.');
 		outputRawMarkdown = false;
-	}
-	else if (toBool(getInput('use-check'))) {
+	} else if (toBool(getInput('use-check'))) {
 		if (token) {
 			const finish = await createCheck(octokit, context);
 			await finish({
@@ -187,38 +189,34 @@ async function run(octokit, context, token) {
 					summary: markdownDiff
 				}
 			});
-		}
-		else {
+		} else {
 			outputRawMarkdown = true;
 		}
-	}
-	else {
+	} else {
 		startGroup(`Updating stats PR comment`);
 		let commentId;
 		try {
 			const comments = (await octokit.issues.listComments(commentInfo)).data;
-			for (let i = comments.length; i--;) {
+			for (let i = comments.length; i--; ) {
 				const c = comments[i];
 				if (c.user.type === 'Bot' && /<sub>[\s\n]*(compressed|gzip)-size-action/.test(c.body)) {
 					commentId = c.id;
 					break;
 				}
 			}
-		}
-		catch (e) {
+		} catch (e) {
 			console.log('Error checking for previous comments: ' + e.message);
 		}
 
 		if (commentId) {
-			console.log(`Updating previous comment #${commentId}`)
+			console.log(`Updating previous comment #${commentId}`);
 			try {
 				await octokit.issues.updateComment({
 					...context.repo,
 					comment_id: commentId,
 					body: comment.body
 				});
-			}
-			catch (e) {
+			} catch (e) {
 				console.log('Error editing previous comment: ' + e.message);
 				commentId = null;
 			}
@@ -251,12 +249,14 @@ async function run(octokit, context, token) {
 	}
 
 	if (outputRawMarkdown) {
-		console.log(`
+		console.log(
+			`
 			Error: compressed-size-action was unable to comment on your PR.
 			This can happen for PR's originating from a fork without write permissions.
 			You can copy the size table directly into a comment using the markdown below:
 			\n\n${comment.body}\n\n
-		`.replace(/^(\t|  )+/gm, ''));
+		`.replace(/^(\t|  )+/gm, '')
+		);
 	}
 
 	console.log('All done!');
@@ -272,10 +272,10 @@ async function createCheck(octokit, context) {
 		...context.repo,
 		name: 'Compressed Size',
 		head_sha: context.payload.pull_request.head.sha,
-		status: 'in_progress',
+		status: 'in_progress'
 	});
 
-	return async details => {
+	return async (details) => {
 		await octokit.checks.update({
 			...context.repo,
 			check_run_id: check.data.id,

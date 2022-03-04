@@ -2,7 +2,7 @@
 
 A GitHub action that reports changes in compressed file sizes on your PRs.
 
-- Automatically uses `yarn` or `npm ci` when lockfiles are present
+- Automatically uses `yarn`, `pnpm` or `npm ci` when lockfiles are present
 - Builds your PR, then builds the target and compares between the two
 - Doesn't upload anything or rely on centralized storage
 - Supports [custom build scripts](#customizing-the-build) and [file patterns](#customizing-the-list-of-files)
@@ -10,7 +10,6 @@ A GitHub action that reports changes in compressed file sizes on your PRs.
 <img width="396" src="https://user-images.githubusercontent.com/105127/73027546-a0176a80-3e01-11ea-887b-7326ee289893.png">
 
 <img width="600" src="https://user-images.githubusercontent.com/105127/73027489-8413c900-3e01-11ea-8630-09172b247f82.png">
-
 
 ### Usage:
 
@@ -23,12 +22,11 @@ on: [pull_request]
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
-    - uses: preactjs/compressed-size-action@v2
+      - uses: actions/checkout@v2
+      - uses: preactjs/compressed-size-action@v2
 ```
 
 ### Customizing the Build
@@ -134,14 +132,14 @@ By default, the characters matched by the regex are removed from filenames.
 In the example below, a filename `foo.abcde.js` will be converted to `foo.js`:
 
 ```yaml
-  strip-hash: "\\b\\w{5}\\."
+strip-hash: "\\b\\w{5}\\."
 ```
 
 This can be customized further using parens to create submatches, which mark where a hash occurs. When a submatch is detected, it will be replaced with asterisks. This is particularly useful when mix of hashed and unhashed filenames are present.
 In the example below, a filename `foo.abcde.chunk.js` will be converted to `foo.*****.chunk.js`:
 
 ```yaml
-  strip-hash: "\\.(\\w{5})\\.chunk\\.js$"
+strip-hash: "\\.(\\w{5})\\.chunk\\.js$"
 ```
 
 ### Increasing the required threshold
@@ -149,16 +147,15 @@ In the example below, a filename `foo.abcde.chunk.js` will be converted to `foo.
 By default, a file that's been changed by a single byte will be reported as changed. If you'd prefer to require a certain minimum threshold for a file to be changed, you can specify `minimum-change-threshold` in bytes:
 
 ```yaml
-  minimum-change-threshold: 100
+minimum-change-threshold: 100
 ```
 
 In the above example, a file with a delta of less than 100 bytes will be reported as unchanged.
 
 ### Compression
 
-By default, files are compared after gzip compression, but it's possible to use other compression algorithms (`gzip/brotli/none`) or disable the compression. 
+By default, files are compared after gzip compression, but it's possible to use other compression algorithms (`gzip/brotli/none`) or disable the compression.
 
 ```yaml
-  compression: 'none'
+compression: "none"
 ```
-
