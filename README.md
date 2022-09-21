@@ -113,7 +113,7 @@ jobs:
 +       exclude: "{./build-output/manifest.json,**/*.map,**/node_modules/**}"
 ```
 
-Files are collected by finding matches for `pattern`, then any of those that match `exclude` are ignored. For that reason, most project don't need to modify `exclude`. The default values for `pattern` and `exclude` are as follows:
+Files are collected by finding matches for `pattern`, then any of those that match `exclude` are ignored. For that reason, most projects don't need to modify `exclude`. The default values for `pattern` and `exclude` are as follows:
 
 ```yaml
 with:
