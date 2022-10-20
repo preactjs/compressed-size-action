@@ -66,6 +66,11 @@ async function run(octokit, context, token) {
 		installScript = 'npm ci';
 	}
 
+	const configInstallScript = getInput('install-script');
+	if (configInstallScript) {
+		installScript = `${packageManager} run ${configInstallScript}`;
+	}
+
 	startGroup(`[current] Install Dependencies`);
 	console.log(`Installing using ${installScript}`);
 	await exec(installScript);

@@ -11,6 +11,8 @@ inputs:
     default: ${{ github.token }}
   clean-script:
     description: 'An npm-script that cleans/resets state between branch builds'
+  install-script:
+    description: 'The npm-script to run that installs your project'
   build-script:
     description: 'The npm-script to run that builds your project'
     default: 'build'
