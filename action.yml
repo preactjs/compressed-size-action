@@ -40,5 +40,5 @@ inputs:
   cwd:
     description: 'A custom working directory to execute the action in relative to repo root (defaults to .)'
 runs:
-  using: 'node12'
+  using: 'node16'
   main: 'index.js'
