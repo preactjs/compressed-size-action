@@ -11,6 +11,7 @@
     "@actions/core": "^1.2.6",
     "@actions/exec": "^1.0.4",
     "@actions/github": "^4.0.0",
+    "@actions/glob": "^0.4.0",
     "@babel/core": "^7.12.10",
     "@babel/preset-env": "^7.12.11",
     "@types/jest": "^26.0.19",

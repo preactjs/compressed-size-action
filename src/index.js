@@ -1,9 +1,9 @@
-import path from 'path';
-import { getInput, setFailed, startGroup, endGroup, debug } from '@actions/core';
-import { context, getOctokit } from '@actions/github';
+import { debug, endGroup, getInput, setFailed, startGroup } from '@actions/core';
 import { exec } from '@actions/exec';
+import { context, getOctokit } from '@actions/github';
+import path from 'node:path';
 import SizePlugin from 'size-plugin-core';
-import { fileExists, diffTable, toBool, stripHash } from './utils.js';
+import { diffTable, fileExists, isYarn3, stripHash, toBool } from './utils.js';
 
 /**
  * @typedef {ReturnType<typeof import("@actions/github").getOctokit>} Octokit
@@ -48,7 +48,9 @@ async function run(octokit, context, token) {
 	});
 
 	const buildScript = getInput('build-script') || 'build';
-	const cwd = process.cwd();
+	const cwd = process.env['GITHUB_WORKSPACE'] ?? process.cwd();
+
+	const yarn3 = await isYarn3(cwd);
 
 	let yarnLock = await fileExists(path.resolve(cwd, 'yarn.lock'));
 	let pnpmLock = await fileExists(path.resolve(cwd, 'pnpm-lock.yaml'));
@@ -57,8 +59,12 @@ async function run(octokit, context, token) {
 	let packageManager = 'npm';
 	let installScript = 'npm install';
 	if (yarnLock) {
-		installScript = 'yarn --frozen-lockfile';
 		packageManager = 'yarn';
+		if (yarn3) {
+			installScript = `yarn --immutable`;
+		} else {
+			installScript = 'yarn --frozen-lockfile';
+		}
 	} else if (pnpmLock) {
 		installScript = 'pnpm install --frozen-lockfile';
 		packageManager = 'pnpm';
@@ -126,8 +132,12 @@ async function run(octokit, context, token) {
 	packageManager = 'npm';
 	installScript = 'npm install';
 	if (yarnLock) {
-		installScript = `yarn --frozen-lockfile`;
 		packageManager = `yarn`;
+		if (yarn3) {
+			installScript = `yarn --immutable`;
+		} else {
+			installScript = `yarn --frozen-lockfile`;
+		}
 	} else if (pnpmLock) {
 		installScript = `pnpm install --frozen-lockfile`;
 		packageManager = `pnpm`;
