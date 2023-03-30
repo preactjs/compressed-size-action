@@ -1,4 +1,6 @@
-import fs from 'fs';
+import * as glob from '@actions/glob';
+import fs from 'node:fs';
+import path from 'node:path';
 import prettyBytes from 'pretty-bytes';
 
 /**
@@ -187,4 +189,15 @@ export function diffTable(files, { showTotal, collapseUnchanged, omitUnchanged, 
  */
 export function toBool(v) {
 	return /^(1|true|yes)$/.test(v);
+}
+
+/**
+ * Check if a release of yarn3 exists in the project
+ * @param {string} cwd
+ */
+export async function isYarn3(cwd) {
+	const globber = await glob.create(path.resolve(cwd, '.yarn', 'releases', 'yarn-*.cjs'));
+	const files = await globber.glob();
+	const isYarn3 = files.length > 0;
+	return isYarn3;
 }

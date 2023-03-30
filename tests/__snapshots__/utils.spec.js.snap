@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`diffTable 1`] = `
+exports[`utils diffTable 1`] = `
 "**Size Change:** +9 B (0%) 
 
 **Total Size:** 14.8 kB
@@ -22,7 +22,7 @@ exports[`diffTable 1`] = `
 "
 `;
 
-exports[`diffTable 2`] = `
+exports[`utils diffTable 2`] = `
 "| Filename | Size | Change |  |
 | :--- | :---: | :---: | :---: |
 | \`one.js\` | 5 kB | +2.5 kB (+100%) | 🆘 |
@@ -40,7 +40,7 @@ exports[`diffTable 2`] = `
 "
 `;
 
-exports[`diffTable 3`] = `
+exports[`utils diffTable 3`] = `
 "**Size Change:** +9 B (0%) 
 
 **Total Size:** 14.8 kB
@@ -53,7 +53,7 @@ exports[`diffTable 3`] = `
 | \`four.js\` | 4.5 kB | +9 B (0%) |  |"
 `;
 
-exports[`diffTable 4`] = `
+exports[`utils diffTable 4`] = `
 "**Size Change:** +9 B (0%) 
 
 **Total Size:** 14.8 kB
@@ -65,7 +65,7 @@ exports[`diffTable 4`] = `
 | \`four.js\` | 4.5 kB | +9 B (0%) |  |"
 `;
 
-exports[`diffTable 5`] = `
+exports[`utils diffTable 5`] = `
 "**Size Change:** +9 B (0%) 
 
 **Total Size:** 14.8 kB
@@ -87,7 +87,7 @@ exports[`diffTable 5`] = `
 "
 `;
 
-exports[`diffTable 6`] = `
+exports[`utils diffTable 6`] = `
 "**Size Change:** 0 B 
 
 **Total Size:** 14.8 kB
@@ -108,7 +108,7 @@ exports[`diffTable 6`] = `
 "
 `;
 
-exports[`diffTable 7`] = `
+exports[`utils diffTable 7`] = `
 "**Size Change:** 0 B 
 
 **Total Size:** 300 B
