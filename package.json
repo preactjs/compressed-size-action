@@ -14,9 +14,9 @@
     "@actions/glob": "^0.4.0",
     "@babel/core": "^7.12.10",
     "@babel/preset-env": "^7.12.11",
-    "@types/jest": "^26.0.19",
-    "babel-jest": "^26.6.3",
-    "jest": "^26.6.3",
+    "@types/jest": "^29.5.0",
+    "babel-jest": "^29.5.0",
+    "jest": "^29.5.0",
     "microbundle": "^0.12.4",
     "pretty-bytes": "^5.4.1",
     "size-plugin-core": "0.0.9"
