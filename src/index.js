@@ -66,6 +66,11 @@ async function run(octokit, context, token) {
 		installScript = 'npm ci';
 	}
 
+	let configInstallScript = getInput('install-script');
+	if (configInstallScript) {
+		installScript = `${packageManager} run ${configInstallScript}`;
+	}
+
 	startGroup(`[current] Install Dependencies`);
 	console.log(`Installing using ${installScript}`);
 	await exec(installScript);
@@ -133,6 +138,11 @@ async function run(octokit, context, token) {
 		packageManager = `pnpm`;
 	} else if (packageLock) {
 		installScript = `npm ci`;
+	}
+
+	configInstallScript = getInput('install-script');
+	if (configInstallScript) {
+		installScript = `${packageManager} run ${configInstallScript}`;
 	}
 
 	console.log(`Installing using ${installScript}`);
