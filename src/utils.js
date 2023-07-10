@@ -42,8 +42,9 @@ export function stripHash(regex) {
 /**
  * @param {number} delta
  * @param {number} originalSize
+ * @param {number} decimalPlaces
  */
-export function getDeltaText(delta, originalSize) {
+export function getDeltaText(delta, originalSize, decimalPlaces = 0) {
 	let deltaText = (delta > 0 ? '+' : '') + prettyBytes(delta);
 	if (Math.abs(delta) === 0) {
 		// only print size
@@ -52,7 +53,7 @@ export function getDeltaText(delta, originalSize) {
 	} else if (originalSize === -delta) {
 		deltaText += ` (removed)`;
 	} else {
-		const percentage = Math.round((delta / originalSize) * 100);
+		const percentage = ((delta / originalSize) * 100).toFixed(decimalPlaces);
 		deltaText += ` (${percentage > 0 ? '+' : ''}${percentage}%)`;
 	}
 	return deltaText;
@@ -133,8 +134,9 @@ function markdownTable(rows) {
  * @param {boolean} [options.collapseUnchanged]
  * @param {boolean} [options.omitUnchanged]
  * @param {number} [options.minimumChangeThreshold]
+ * @param {number} [options.decimalPlaces]
  */
-export function diffTable(files, { showTotal, collapseUnchanged, omitUnchanged, minimumChangeThreshold }) {
+export function diffTable(files, { showTotal, collapseUnchanged, omitUnchanged, minimumChangeThreshold, decimalPlaces }) {
 	let changedRows = [];
 	let unChangedRows = [];
 
@@ -153,7 +155,7 @@ export function diffTable(files, { showTotal, collapseUnchanged, omitUnchanged, 
 		const columns = [
 			`\`${filename}\``, 
 			prettyBytes(size), 
-			getDeltaText(delta, originalSize),
+			getDeltaText(delta, originalSize, decimalPlaces),
 			iconForDifference(delta, originalSize)
 		];
 		if (isUnchanged && collapseUnchanged) {
@@ -172,7 +174,7 @@ export function diffTable(files, { showTotal, collapseUnchanged, omitUnchanged, 
 
 	if (showTotal) {
 		const totalOriginalSize = totalSize - totalDelta;
-		let totalDeltaText = getDeltaText(totalDelta, totalOriginalSize);
+		let totalDeltaText = getDeltaText(totalDelta, totalOriginalSize, decimalPlaces);
 		let totalIcon = iconForDifference(totalDelta, totalOriginalSize);
 		out = `**Total Size:** ${prettyBytes(totalSize)}\n\n${out}`;
 		out = `**Size Change:** ${totalDeltaText} ${totalIcon}\n\n${out}`;
