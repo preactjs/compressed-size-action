@@ -159,3 +159,11 @@ By default, files are compared after gzip compression, but it's possible to use 
 ```yaml
 compression: "none"
 ```
+
+### Showing percentage change with decimal places
+
+The number of decimal places in the percentage change displayed in the table can be set to a level of precision. By default the percentage is rounded to an integer.
+
+```yaml
+percent-decimal-places: 2
+```
