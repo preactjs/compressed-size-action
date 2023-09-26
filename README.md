@@ -37,10 +37,10 @@ If you need to perform some tasks after dependencies are installed but before bu
 
 ```json
 {
-  "scripts": {
-    "postinstall": "lerna bootstrap",
-    "build": "lerna run build"
-  }
+	"scripts": {
+		"postinstall": "lerna bootstrap",
+		"build": "lerna run build"
+	}
 }
 ```
 
@@ -65,6 +65,25 @@ jobs:
 +       build-script: "ci"
 ```
 
+Happens similar with install. You can specify a completely different script to run instead of the default (`"npm install"`). To do this, add a **`install-script` option** to your `yml` workflow:
+
+```diff
+name: Compressed Size
+
+on: [pull_request]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - uses: preactjs/compressed-size-action@v2
+      with:
++       install-script: "npm install --legacy-peer-deps --no-audit"
+```
+
 #### Clean up state between builds
 
 For repositories or custom monorepo setups where files are modified in ways that are not reset by `npm ci && npm run build`, it may be necessary to define a custom "clean" script. This script resets any file modifications after the upstream (`target`) build ends and your PR code (`HEAD`) is checked out, but before installation of npm dependencies for `HEAD`:
@@ -86,12 +105,12 @@ jobs:
 ```jsonc
 // package.json
 {
-  "scripts": {
-    // example - a simple nested node_modules setup:
-    "postinstall": "cd packages && npm i",
-    // between the two builds, we need to delete the inner node_modules:
-    "clean": "rm -rf packages/node_modules"
-  }
+	"scripts": {
+		// example - a simple nested node_modules setup:
+		"postinstall": "cd packages && npm i",
+		// between the two builds, we need to delete the inner node_modules:
+		"clean": "rm -rf packages/node_modules"
+	}
 }
 ```
 
@@ -118,10 +137,10 @@ Files are collected by finding matches for `pattern`, then any of those that mat
 ```yaml
 with:
   # Any JS files anywhere within a dist directory:
-  pattern: "**/dist/**/*.js"
+  pattern: '**/dist/**/*.js'
 
   # Always ignore SourceMaps and node_modules:
-  exclude: "{**/*.map,**/node_modules/**}"
+  exclude: '{**/*.map,**/node_modules/**}'
 ```
 
 ### Dealing with hashed filenames
@@ -157,5 +176,5 @@ In the above example, a file with a delta of less than 100 bytes will be reporte
 By default, files are compared after gzip compression, but it's possible to use other compression algorithms (`gzip/brotli/none`) or disable the compression.
 
 ```yaml
-compression: "none"
+compression: 'none'
 ```

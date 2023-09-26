@@ -11,6 +11,9 @@ inputs:
     default: ${{ github.token }}
   clean-script:
     description: 'An npm-script that cleans/resets state between branch builds'
+  install-script:
+    description: 'The script to run that installs your project'
+    default: 'npm install'
   build-script:
     description: 'The npm-script to run that builds your project'
     default: 'build'
@@ -33,7 +36,7 @@ inputs:
     default: 1
   pattern:
     description: 'minimatch pattern of files to track'
-    default:  '**/dist/**/*.js'
+    default: '**/dist/**/*.js'
   exclude:
     description: 'minimatch pattern of files NOT to track'
     default: '{**/*.map,**/node_modules/**}'
