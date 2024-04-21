@@ -37,10 +37,10 @@ If you need to perform some tasks after dependencies are installed but before bu
 
 ```json
 {
-	"scripts": {
-		"postinstall": "lerna bootstrap",
-		"build": "lerna run build"
-	}
+  "scripts": {
+    "postinstall": "lerna bootstrap",
+    "build": "lerna run build"
+  }
 }
 ```
 
@@ -86,12 +86,12 @@ jobs:
 ```jsonc
 // package.json
 {
-	"scripts": {
-		// example - a simple nested node_modules setup:
-		"postinstall": "cd packages && npm i",
-		// between the two builds, we need to delete the inner node_modules:
-		"clean": "rm -rf packages/node_modules"
-	}
+  "scripts": {
+    // example - a simple nested node_modules setup:
+    "postinstall": "cd packages && npm i",
+    // between the two builds, we need to delete the inner node_modules:
+    "clean": "rm -rf packages/node_modules"
+  }
 }
 ```
 
