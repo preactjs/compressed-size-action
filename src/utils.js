@@ -52,7 +52,7 @@ export function getDeltaText(delta, originalSize) {
 	} else if (originalSize === -delta) {
 		deltaText += ` (removed)`;
 	} else {
-		const percentage = Math.round((delta / originalSize) * 100);
+		const percentage = Number(((delta / originalSize) * 100).toFixed(2));
 		deltaText += ` (${percentage > 0 ? '+' : ''}${percentage}%)`;
 	}
 	return deltaText;
@@ -151,8 +151,8 @@ export function diffTable(files, { showTotal, collapseUnchanged, omitUnchanged, 
 		if (isUnchanged && omitUnchanged) continue;
 
 		const columns = [
-			`\`${filename}\``, 
-			prettyBytes(size), 
+			`\`${filename}\``,
+			prettyBytes(size),
 			getDeltaText(delta, originalSize),
 			iconForDifference(delta, originalSize)
 		];
