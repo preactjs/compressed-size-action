@@ -39,9 +39,6 @@ inputs:
     default: '{**/*.map,**/node_modules/**}'
   cwd:
     description: 'A custom working directory to execute the action in relative to repo root (defaults to .)'
-  percent-decimal-places:
-    description: 'The number of decimal places to use with percentages'
-    default: 0
 runs:
   using: 'node20'
   main: 'index.js'

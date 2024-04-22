@@ -167,8 +167,7 @@ async function run(octokit, context, token) {
 		collapseUnchanged: toBool(getInput('collapse-unchanged')),
 		omitUnchanged: toBool(getInput('omit-unchanged')),
 		showTotal: toBool(getInput('show-total')),
-		minimumChangeThreshold: parseInt(getInput('minimum-change-threshold'), 10),
-		decimalPlaces: parseInt(getInput('percent-decimal-places'), 10)
+		minimumChangeThreshold: parseInt(getInput('minimum-change-threshold'), 10)
 	});
 
 	let outputRawMarkdown = false;

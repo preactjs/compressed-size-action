@@ -42,9 +42,8 @@ export function stripHash(regex) {
 /**
  * @param {number} delta
  * @param {number} originalSize
- * @param {number} decimalPlaces
  */
-export function getDeltaText(delta, originalSize, decimalPlaces = 0) {
+export function getDeltaText(delta, originalSize) {
 	let deltaText = (delta > 0 ? '+' : '') + prettyBytes(delta);
 	if (Math.abs(delta) === 0) {
 		// only print size
@@ -53,7 +52,7 @@ export function getDeltaText(delta, originalSize, decimalPlaces = 0) {
 	} else if (originalSize === -delta) {
 		deltaText += ` (removed)`;
 	} else {
-		const percentage = ((delta / originalSize) * 100).toFixed(decimalPlaces);
+		const percentage = Number(((delta / originalSize) * 100).toFixed(2));
 		deltaText += ` (${percentage > 0 ? '+' : ''}${percentage}%)`;
 	}
 	return deltaText;
@@ -134,9 +133,8 @@ function markdownTable(rows) {
  * @param {boolean} [options.collapseUnchanged]
  * @param {boolean} [options.omitUnchanged]
  * @param {number} [options.minimumChangeThreshold]
- * @param {number} [options.decimalPlaces]
  */
-export function diffTable(files, { showTotal, collapseUnchanged, omitUnchanged, minimumChangeThreshold, decimalPlaces }) {
+export function diffTable(files, { showTotal, collapseUnchanged, omitUnchanged, minimumChangeThreshold }) {
 	let changedRows = [];
 	let unChangedRows = [];
 
@@ -153,9 +151,9 @@ export function diffTable(files, { showTotal, collapseUnchanged, omitUnchanged, 
 		if (isUnchanged && omitUnchanged) continue;
 
 		const columns = [
-			`\`${filename}\``, 
-			prettyBytes(size), 
-			getDeltaText(delta, originalSize, decimalPlaces),
+			`\`${filename}\``,
+			prettyBytes(size),
+			getDeltaText(delta, originalSize),
 			iconForDifference(delta, originalSize)
 		];
 		if (isUnchanged && collapseUnchanged) {
@@ -174,7 +172,7 @@ export function diffTable(files, { showTotal, collapseUnchanged, omitUnchanged, 
 
 	if (showTotal) {
 		const totalOriginalSize = totalSize - totalDelta;
-		let totalDeltaText = getDeltaText(totalDelta, totalOriginalSize, decimalPlaces);
+		let totalDeltaText = getDeltaText(totalDelta, totalOriginalSize);
 		let totalIcon = iconForDifference(totalDelta, totalOriginalSize);
 		out = `**Total Size:** ${prettyBytes(totalSize)}\n\n${out}`;
 		out = `**Size Change:** ${totalDeltaText} ${totalIcon}\n\n${out}`;

@@ -15,10 +15,8 @@ test('getDeltaText', () => {
 	expect(getDeltaText(-5000, 20000)).toBe('-5 kB (-25%)');
 	expect(getDeltaText(210, 0)).toBe('+210 B (new file)');
 	expect(getDeltaText(0, 0)).toBe('0 B');
-	expect(getDeltaText(4875, 20000)).toBe('+4.88 kB (+24%)');
-	expect(getDeltaText(-4875, 20000)).toBe('-4.88 kB (-24%)');
-	expect(getDeltaText(4875, 20000, 2)).toBe('+4.88 kB (+24.38%)');
-	expect(getDeltaText(-4875, 20000,2)).toBe('-4.88 kB (-24.38%)');
+	expect(getDeltaText(4875, 20000)).toBe('+4.88 kB (+24.38%)');
+	expect(getDeltaText(-4875, 20000)).toBe('-4.88 kB (-24.38%)');
 });
 
 test('iconForDifference', () => {
