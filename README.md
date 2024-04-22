@@ -29,6 +29,26 @@ jobs:
       - uses: preactjs/compressed-size-action@v2
 ```
 
+### Customizing the Installation
+
+By default, `compressed-size-action` will install dependencies according to which lockfiles are present, if any. However, if you need to run a different installation command, you can pass a custom script to do so. For example, to use `npm ci` with the `--workspace` option:
+
+```diff
+name: Compressed Size
+
+on: [pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - uses: preactjs/compressed-size-action@v2
+      with:
++       install-script: "npm ci --workspace=packages/my-subpackage"
+```
+
 ### Customizing the Build
 
 By default, `compressed-size-action` will try to build your PR by running the `"build"` [npm script](https://docs.npmjs.com/misc/scripts) in your `package.json`.
