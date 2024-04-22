@@ -2,7 +2,7 @@
 
 A GitHub action that reports changes in compressed file sizes on your PRs.
 
-- Automatically uses `yarn`, `pnpm` or `npm ci` when lockfiles are present
+- Automatically uses `yarn`, `pnpm`, `bun`, or `npm ci` when lockfiles are present
 - Builds your PR, then builds the target and compares between the two
 - Doesn't upload anything or rely on centralized storage
 - Supports [custom build scripts](#customizing-the-build) and [file patterns](#customizing-the-list-of-files)
