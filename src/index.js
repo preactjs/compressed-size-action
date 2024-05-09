@@ -92,7 +92,7 @@ async function run(octokit, context, token) {
 	startGroup(`[base] Checkout target branch`);
 	try {
 		if (!baseRef) throw Error('missing context.payload.pull_request.base.ref');
-		await exec(`git fetch -n origin ${baseRef}`);
+		await exec(`git fetch -n origin ${baseRef}:${baseRef}`);
 		console.log('successfully fetched base.ref');
 	} catch (e) {
 		console.log('fetching base.ref failed', e.message);
