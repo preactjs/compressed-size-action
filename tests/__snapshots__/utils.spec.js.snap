@@ -1,15 +1,15 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`diffTable 1`] = `
-"**Size Change:** +9 B (0%) 
+"**Size Change:** +9 B (+0.06%) 
 
 **Total Size:** 14.8 kB
 
 | Filename | Size | Change |  |
 | :--- | :---: | :---: | :---: |
 | \`one.js\` | 5 kB | +2.5 kB (+100%) | 🆘 |
-| \`two.js\` | 5 kB | -2.5 kB (-33%) | 🎉 |
-| \`four.js\` | 4.5 kB | +9 B (0%) |  |
+| \`two.js\` | 5 kB | -2.5 kB (-33.33%) | 🎉 |
+| \`four.js\` | 4.5 kB | +9 B (+0.2%) |  |
 
 <details><summary>ℹ️ <strong>View Unchanged</strong></summary>
 
@@ -26,8 +26,8 @@ exports[`diffTable 2`] = `
 "| Filename | Size | Change |  |
 | :--- | :---: | :---: | :---: |
 | \`one.js\` | 5 kB | +2.5 kB (+100%) | 🆘 |
-| \`two.js\` | 5 kB | -2.5 kB (-33%) | 🎉 |
-| \`four.js\` | 4.5 kB | +9 B (0%) |  |
+| \`two.js\` | 5 kB | -2.5 kB (-33.33%) | 🎉 |
+| \`four.js\` | 4.5 kB | +9 B (+0.2%) |  |
 
 <details><summary>ℹ️ <strong>View Unchanged</strong></summary>
 
@@ -41,46 +41,46 @@ exports[`diffTable 2`] = `
 `;
 
 exports[`diffTable 3`] = `
-"**Size Change:** +9 B (0%) 
+"**Size Change:** +9 B (+0.06%) 
 
 **Total Size:** 14.8 kB
 
 | Filename | Size | Change |  |
 | :--- | :---: | :---: | :---: |
 | \`one.js\` | 5 kB | +2.5 kB (+100%) | 🆘 |
-| \`two.js\` | 5 kB | -2.5 kB (-33%) | 🎉 |
+| \`two.js\` | 5 kB | -2.5 kB (-33.33%) | 🎉 |
 | \`three.js\` | 300 B | 0 B |  |
-| \`four.js\` | 4.5 kB | +9 B (0%) |  |"
+| \`four.js\` | 4.5 kB | +9 B (+0.2%) |  |"
 `;
 
 exports[`diffTable 4`] = `
-"**Size Change:** +9 B (0%) 
+"**Size Change:** +9 B (+0.06%) 
 
 **Total Size:** 14.8 kB
 
 | Filename | Size | Change |  |
 | :--- | :---: | :---: | :---: |
 | \`one.js\` | 5 kB | +2.5 kB (+100%) | 🆘 |
-| \`two.js\` | 5 kB | -2.5 kB (-33%) | 🎉 |
-| \`four.js\` | 4.5 kB | +9 B (0%) |  |"
+| \`two.js\` | 5 kB | -2.5 kB (-33.33%) | 🎉 |
+| \`four.js\` | 4.5 kB | +9 B (+0.2%) |  |"
 `;
 
 exports[`diffTable 5`] = `
-"**Size Change:** +9 B (0%) 
+"**Size Change:** +9 B (+0.06%) 
 
 **Total Size:** 14.8 kB
 
 | Filename | Size | Change |  |
 | :--- | :---: | :---: | :---: |
 | \`one.js\` | 5 kB | +2.5 kB (+100%) | 🆘 |
-| \`two.js\` | 5 kB | -2.5 kB (-33%) | 🎉 |
+| \`two.js\` | 5 kB | -2.5 kB (-33.33%) | 🎉 |
 
 <details><summary>ℹ️ <strong>View Unchanged</strong></summary>
 
 | Filename | Size | Change |
 | :--- | :---: | :---: |
 | \`three.js\` | 300 B | 0 B |
-| \`four.js\` | 4.5 kB | +9 B (0%) |
+| \`four.js\` | 4.5 kB | +9 B (+0.2%) |
 
 </details>
 

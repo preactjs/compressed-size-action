@@ -2,7 +2,7 @@
 
 A GitHub action that reports changes in compressed file sizes on your PRs.
 
-- Automatically uses `yarn`, `pnpm` or `npm ci` when lockfiles are present
+- Automatically uses `yarn`, `pnpm`, `bun`, or `npm ci` when lockfiles are present
 - Builds your PR, then builds the target and compares between the two
 - Doesn't upload anything or rely on centralized storage
 - Supports [custom build scripts](#customizing-the-build) and [file patterns](#customizing-the-list-of-files)
@@ -27,6 +27,26 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: preactjs/compressed-size-action@v2
+```
+
+### Customizing the Installation
+
+By default, `compressed-size-action` will install dependencies according to which lockfiles are present, if any. However, if you need to run a different installation command, you can pass a custom script to do so. For example, to use `npm ci` with the `--workspace` option:
+
+```diff
+name: Compressed Size
+
+on: [pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - uses: preactjs/compressed-size-action@v2
+      with:
++       install-script: "npm ci --workspace=packages/my-subpackage"
 ```
 
 ### Customizing the Build
@@ -113,7 +133,7 @@ jobs:
 +       exclude: "{./build-output/manifest.json,**/*.map,**/node_modules/**}"
 ```
 
-Files are collected by finding matches for `pattern`, then any of those that match `exclude` are ignored. For that reason, most project don't need to modify `exclude`. The default values for `pattern` and `exclude` are as follows:
+Files are collected by finding matches for `pattern`, then any of those that match `exclude` are ignored. For that reason, most projects don't need to modify `exclude`. The default values for `pattern` and `exclude` are as follows:
 
 ```yaml
 with:
