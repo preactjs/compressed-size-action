@@ -218,7 +218,7 @@ async function run(octokit, context, token) {
 			const commentRegExp = new RegExp(`<sub>[\s\n]*(compressed|gzip)-size-action${commentKey ? `::${commentKey}` : ''}</sub>`)
 			for (let i = comments.length; i--; ) {
 				const c = comments[i];
-				if (c.user.type === 'Bot' && commentRegExp.test(c.body)) {
+				if (commentRegExp.test(c.body)) {
 					commentId = c.id;
 					break;
 				}
