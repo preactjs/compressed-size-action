@@ -23,4 +23,4 @@ jobs:
         with:
           repo-token: "${{ secrets.GITHUB_TOKEN }}"
           comment-key: "key-2"
-          pattern: index.js
+          pattern: src/index.js
