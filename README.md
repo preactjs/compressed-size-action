@@ -179,3 +179,32 @@ By default, files are compared after gzip compression, but it's possible to use 
 ```yaml
 compression: "none"
 ```
+
+### Checking multiple bundles
+
+The action reuses the same comment each time it runs on a PR. In order to run the action multiple times against separate bundles for a single PR, you must provide a `comment-key` option, which the action will use to determine which comment to add or update for the run. The example below demonstrates this for separate "modern" and "legacy" bundles:
+
+```diff
+name: Compressed Size
+on: [pull_request]
+jobs:
+  modern-bundle-size-check:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: preactjs/compressed-size-action@v2
+      with:
+        build-script: "build:modern"
++       comment-key: modern
+
+  legacy-bundle-size-check:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: preactjs/compressed-size-action@v2
+      with:
+        build-script: "build:legacy"
++       comment-key: legacy
+```
+
+If you do not provide this key, the action will attempt to use (and therefore replace) the same comment for both bundles, hiding the output for whichever run finished last.

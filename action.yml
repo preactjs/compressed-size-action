@@ -42,6 +42,9 @@ inputs:
     default: '{**/*.map,**/node_modules/**}'
   cwd:
     description: 'A custom working directory to execute the action in relative to repo root (defaults to .)'
+  comment-key:
+    description: 'Optional key to include in the bot comment to allow for multiple bundle calculations to be posted in separate comments.'
+
 runs:
   using: 'node20'
   main: 'index.js'

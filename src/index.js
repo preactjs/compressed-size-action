@@ -185,11 +185,13 @@ async function run(octokit, context, token) {
 		issue_number: pull_number
 	};
 
+	const commentKey = getInput('comment-key')
+
 	const comment = {
 		...commentInfo,
 		body:
 			markdownDiff +
-			'\n\n<a href="https://github.com/preactjs/compressed-size-action"><sub>compressed-size-action</sub></a>'
+			`\n\n<a href="https://github.com/preactjs/compressed-size-action"><sub>compressed-size-action${commentKey ? `::${commentKey}` : ''}</sub></a>`
 	};
 
 	if (context.eventName !== 'pull_request' && context.eventName !== 'pull_request_target') {
@@ -213,9 +215,10 @@ async function run(octokit, context, token) {
 		let commentId;
 		try {
 			const comments = (await octokit.issues.listComments(commentInfo)).data;
+			const commentRegExp = new RegExp(`<sub>[\s\n]*(compressed|gzip)-size-action${commentKey ? `::${commentKey}` : ''}</sub>`)
 			for (let i = comments.length; i--; ) {
 				const c = comments[i];
-				if (/<sub>[\s\n]*(compressed|gzip)-size-action/.test(c.body)) {
+				if (commentRegExp.test(c.body)) {
 					commentId = c.id;
 					break;
 				}
