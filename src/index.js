@@ -5,6 +5,8 @@ import { exec } from '@actions/exec';
 import SizePlugin from 'size-plugin-core';
 import { fileExists, diffTable, toBool, stripHash } from './utils.js';
 
+// Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+
 /**
  * @typedef {ReturnType<typeof import("@actions/github").getOctokit>} Octokit
  * @typedef {typeof import("@actions/github").context} ActionContext
