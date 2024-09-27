@@ -16,4 +16,11 @@ jobs:
         uses: ./
         with:
           repo-token: "${{ secrets.GITHUB_TOKEN }}"
+          comment-key: "key-1"
+          pattern: index.js
+      - name: Report Compressed Size 2: Electric Boogaloo
+        uses: ./
+        with:
+          repo-token: "${{ secrets.GITHUB_TOKEN }}"
+          comment-key: "key-2"
           pattern: index.js
