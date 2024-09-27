@@ -184,7 +184,7 @@ compression: "none"
 
 The action reuses the same comment each time it runs on a PR. In order to run the action multiple times against separate bundles for a single PR, you must provide a `comment-key` option, which the action will use to determine which comment to add or update for the run. The example below demonstrates this for separate "modern" and "legacy" bundles:
 
-```yaml
+```diff
 name: Compressed Size
 on: [pull_request]
 jobs:
@@ -195,7 +195,7 @@ jobs:
     - uses: preactjs/compressed-size-action@v2
       with:
         build-script: "build:modern"
-        comment-key: modern
++       comment-key: modern
 
   legacy-bundle-size-check:
     runs-on: ubuntu-latest
@@ -204,7 +204,7 @@ jobs:
     - uses: preactjs/compressed-size-action@v2
       with:
         build-script: "build:legacy"
-        comment-key: legacy
++       comment-key: legacy
 ```
 
 If you do not provide this key, the action will attempt to use (and therefore replace) the same comment for both bundles, hiding the output for whichever run finished last.
