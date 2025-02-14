@@ -36,10 +36,8 @@ inputs:
     default: 1
   pattern:
     description: 'minimatch pattern of files to track'
-    default:  '**/dist/**/*.js'
   exclude:
     description: 'minimatch pattern of files NOT to track'
-    default: '{**/*.map,**/node_modules/**}'
   cwd:
     description: 'A custom working directory to execute the action in relative to repo root (defaults to .)'
   comment-key:
