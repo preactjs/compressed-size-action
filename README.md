@@ -138,7 +138,7 @@ Files are collected by finding matches for `pattern`, then any of those that mat
 ```yaml
 with:
   # Any JS files anywhere within a dist directory:
-  pattern: "**/dist/**/*.js"
+  pattern: "**/dist/**/*.{js,mjs,cjs}"
 
   # Always ignore SourceMaps and node_modules:
   exclude: "{**/*.map,**/node_modules/**}"
