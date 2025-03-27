@@ -52,7 +52,8 @@ async function run(octokit, context, token) {
 
 	let yarnLock = await fileExists(path.resolve(cwd, 'yarn.lock'));
 	let pnpmLock = await fileExists(path.resolve(cwd, 'pnpm-lock.yaml'));
-	let bunLock = await fileExists(path.resolve(cwd, 'bun.lockb'));
+	let bunLockb = await fileExists(path.resolve(cwd, 'bun.lockb'));
+	let bunLock = await fileExists(path.resolve(cwd, 'bun.lock'));
 	let packageLock = await fileExists(path.resolve(cwd, 'package-lock.json'));
 
 	let packageManager = 'npm';
@@ -63,7 +64,7 @@ async function run(octokit, context, token) {
 	} else if (pnpmLock) {
 		installScript = 'pnpm install --frozen-lockfile';
 		packageManager = 'pnpm';
-	} else if (bunLock) {
+	} else if (bunLockb || bunLock) {
 		installScript = 'bun install --frozen-lockfile';
 		packageManager = 'bun';
 	} else if (packageLock) {
@@ -129,7 +130,8 @@ async function run(octokit, context, token) {
 
 	yarnLock = await fileExists(path.resolve(cwd, 'yarn.lock'));
 	pnpmLock = await fileExists(path.resolve(cwd, 'pnpm-lock.yaml'));
-	bunLock = await fileExists(path.resolve(cwd, 'bun.lockb'));
+	bunLockb = await fileExists(path.resolve(cwd, 'bun.lockb'));
+	bunLock = await fileExists(path.resolve(cwd, 'bun.lock'));
 	packageLock = await fileExists(path.resolve(cwd, 'package-lock.json'));
 
 	packageManager = 'npm';
@@ -140,7 +142,7 @@ async function run(octokit, context, token) {
 	} else if (pnpmLock) {
 		installScript = `pnpm install --frozen-lockfile`;
 		packageManager = `pnpm`;
-	} else if (bunLock) {
+	} else if (bunLockb || bunLock) {
 		installScript = `bun install --frozen-lockfile`;
 		packageManager = `bun`;
 	} else if (packageLock) {
