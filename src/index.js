@@ -1,9 +1,8 @@
-import path from 'path';
 import { getInput, setFailed, startGroup, endGroup, debug } from '@actions/core';
 import { context, getOctokit } from '@actions/github';
 import { exec } from '@actions/exec';
 import SizePlugin from 'size-plugin-core';
-import { fileExists, diffTable, toBool, stripHash } from './utils.js';
+import { getPackageManagerAndInstallScript, diffTable, toBool, stripHash } from './utils.js';
 
 /**
  * @typedef {ReturnType<typeof import("@actions/github").getOctokit>} Octokit
@@ -50,27 +49,7 @@ async function run(octokit, context, token) {
 	const buildScript = getInput('build-script') || 'build';
 	const cwd = process.cwd();
 
-	let yarnLock = await fileExists(path.resolve(cwd, 'yarn.lock'));
-	let pnpmLock = await fileExists(path.resolve(cwd, 'pnpm-lock.yaml'));
-	let bunLockb = await fileExists(path.resolve(cwd, 'bun.lockb'));
-	let bunLock = await fileExists(path.resolve(cwd, 'bun.lock'));
-	let packageLock = await fileExists(path.resolve(cwd, 'package-lock.json'));
-
-	let packageManager = 'npm';
-	let installScript = 'npm install';
-	if (yarnLock) {
-		installScript = 'yarn --frozen-lockfile';
-		packageManager = 'yarn';
-	} else if (pnpmLock) {
-		installScript = 'pnpm install --frozen-lockfile';
-		packageManager = 'pnpm';
-	} else if (bunLockb || bunLock) {
-		installScript = 'bun install --frozen-lockfile';
-		packageManager = 'bun';
-	} else if (packageLock) {
-		installScript = 'npm ci';
-	}
-
+	let { packageManager, installScript } = await getPackageManagerAndInstallScript(cwd);
 	if (getInput('install-script')) {
 		installScript = getInput('install-script');
 	}
@@ -128,27 +107,7 @@ async function run(octokit, context, token) {
 
 	startGroup(`[base] Install Dependencies`);
 
-	yarnLock = await fileExists(path.resolve(cwd, 'yarn.lock'));
-	pnpmLock = await fileExists(path.resolve(cwd, 'pnpm-lock.yaml'));
-	bunLockb = await fileExists(path.resolve(cwd, 'bun.lockb'));
-	bunLock = await fileExists(path.resolve(cwd, 'bun.lock'));
-	packageLock = await fileExists(path.resolve(cwd, 'package-lock.json'));
-
-	packageManager = 'npm';
-	installScript = 'npm install';
-	if (yarnLock) {
-		installScript = `yarn --frozen-lockfile`;
-		packageManager = `yarn`;
-	} else if (pnpmLock) {
-		installScript = `pnpm install --frozen-lockfile`;
-		packageManager = `pnpm`;
-	} else if (bunLockb || bunLock) {
-		installScript = `bun install --frozen-lockfile`;
-		packageManager = `bun`;
-	} else if (packageLock) {
-		installScript = `npm ci`;
-	}
-
+	({ packageManager, installScript } = await getPackageManagerAndInstallScript(cwd));
 	if (getInput('install-script')) {
 		installScript = getInput('install-script');
 	}
