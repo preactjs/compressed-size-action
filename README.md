@@ -164,9 +164,10 @@ strip-hash: "\\.(\\w{5})\\.chunk\\.js$"
 
 ### Increasing the required threshold
 
-By default, a file that's been changed by a single byte will be reported as changed. If you'd prefer to require a certain minimum threshold for a file to be changed, you can specify `minimum-change-threshold` in bytes:
+By default, a file that's been changed by a single byte will be reported as changed. If you'd prefer to require a certain minimum threshold for a file to be changed, you can specify `minimum-change-threshold` in bytes. You'll also need to set `omit-unchanged` if you don't want that listed at all:
 
 ```yaml
+omit-unchanged: true
 minimum-change-threshold: 100
 ```
 
