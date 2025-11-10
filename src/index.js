@@ -4,17 +4,76 @@ import { exec } from '@actions/exec';
 import SizePlugin from 'size-plugin-core';
 import { getPackageManagerAndInstallScript, diffTable, toBool, stripHash } from './utils.js';
 
+const inputs = {
+	repoToken: getInput('repo-token'),
+	cleanScript: getInput('clean-script'),
+	installScript: getInput('install-script'),
+	buildScript: getInput('build-script') || 'build',
+
+	compression: getInput('compression'),
+	showTotal: toBool(getInput('show-total')),
+	collapseUnchanged: toBool(getInput('collapse-unchanged')),
+	omitUnchanged: toBool(getInput('omit-unchanged')),
+	stripHash: getInput('strip-hash'),
+	useCheck: toBool(getInput('use-check')),
+	minimumChangeThreshold: parseInt(getInput('minimum-change-threshold'), 10) || 1,
+	pattern: getInput('pattern') || '**/dist/**/*.{js,mjs,cjs}',
+	exclude: getInput('exclude') || '{**/*.map,**/node_modules/**}',
+	cwd: getInput('cwd'),
+	commentKey: getInput('comment-key')
+};
+
 /**
  * @typedef {ReturnType<typeof import("@actions/github").getOctokit>} Octokit
  * @typedef {typeof import("@actions/github").context} ActionContext
+ */
+
+/**
  * @param {Octokit} octokit
  * @param {ActionContext} context
  * @param {string} token
  */
 async function run(octokit, context, token) {
-	const { owner, repo, number: pull_number } = context.issue;
+	const { number: pull_number } = context.issue;
 
-	// const pr = (await octokit.pulls.get({ owner, repo, pull_number })).data;
+
+  //repo-token:
+  //  description: 'The GITHUB_TOKEN secret'
+  //  required: false
+  //  default: ${{ github.token }}
+  //clean-script:
+  //  description: 'An npm-script that cleans/resets state between branch builds'
+  //install-script:
+  //  required: false
+  //  description: 'Custom installation script to run to set up the dependencies in your project'
+  //build-script:
+  //  description: 'The npm-script to run that builds your project'
+  //  default: 'build'
+  //compression:
+  //  description: 'The compression algorithm to use: "gzip" or "brotli"'
+  //show-total:
+  //  description: 'Show total size and difference.'
+  //  default: 'true'
+  //collapse-unchanged:
+  //  description: 'Move unchanged files into a separate collapsed table'
+  //  default: 'true'
+  //omit-unchanged:
+  //  description: 'Exclude unchanged files from the sizes table entirely'
+  //strip-hash:
+  //  description: 'A regular expression to remove hashes from filenames. Submatches are turned into asterisks if present, otherwise the whole match is removed.'
+  //use-check:
+  //  description: 'Report status as a CI Check instead of using a comment [experimental]'
+  //minimum-change-threshold:
+  //  description: 'Consider files with changes below this threshold as unchanged. Specified in bytes.'
+  //  default: 1
+  //pattern:
+  //  description: 'minimatch pattern of files to track'
+  //exclude:
+  //  description: 'minimatch pattern of files NOT to track'
+  //cwd:
+  //  description: 'A custom working directory to execute the action in relative to repo root (defaults to .)'
+  //comment-key:
+
 	try {
 		debug('pr' + JSON.stringify(context.payload, null, 2));
 	} catch (e) {}
@@ -37,21 +96,20 @@ async function run(octokit, context, token) {
 		);
 	}
 
-	if (getInput('cwd')) process.chdir(getInput('cwd'));
+	if (inputs.cwd) process.chdir(inputs.cwd);
 
 	const plugin = new SizePlugin({
-		compression: getInput('compression'),
-		pattern: getInput('pattern') || '**/dist/**/*.{js,mjs,cjs}',
-		exclude: getInput('exclude') || '{**/*.map,**/node_modules/**}',
-		stripHash: stripHash(getInput('strip-hash'))
+		compression: inputs.compression,
+		pattern: inputs.pattern,
+		exclude: inputs.exclude,
+		stripHash: stripHash(inputs.stripHash)
 	});
 
-	const buildScript = getInput('build-script') || 'build';
 	const cwd = process.cwd();
 
 	let { packageManager, installScript } = await getPackageManagerAndInstallScript(cwd);
-	if (getInput('install-script')) {
-		installScript = getInput('install-script');
+	if (inputs.installScript) {
+		installScript = inputs.installScript;
 	}
 
 	startGroup(`[current] Install Dependencies`);
@@ -60,8 +118,8 @@ async function run(octokit, context, token) {
 	endGroup();
 
 	startGroup(`[current] Build using ${packageManager}`);
-	console.log(`Building using ${packageManager} run ${buildScript}`);
-	await exec(`${packageManager} run ${buildScript}`);
+	console.log(`Building using ${packageManager} run ${inputs.buildScript}`);
+	await exec(`${packageManager} run ${inputs.buildScript}`);
 	endGroup();
 
 	// In case the build step alters a JSON-file, ....
@@ -98,18 +156,17 @@ async function run(octokit, context, token) {
 	}
 	endGroup();
 
-	const cleanScript = getInput('clean-script');
-	if (cleanScript) {
-		startGroup(`[base] Cleanup via ${packageManager} run ${cleanScript}`);
-		await exec(`${packageManager} run ${cleanScript}`);
+	if (inputs.cleanScript) {
+		startGroup(`[base] Cleanup via ${packageManager} run ${inputs.cleanScript}`);
+		await exec(`${packageManager} run ${inputs.cleanScript}`);
 		endGroup();
 	}
 
 	startGroup(`[base] Install Dependencies`);
 
 	({ packageManager, installScript } = await getPackageManagerAndInstallScript(cwd));
-	if (getInput('install-script')) {
-		installScript = getInput('install-script');
+	if (inputs.installScript) {
+		installScript = inputs.installScript;
 	}
 
 	console.log(`Installing using ${installScript}`);
@@ -117,7 +174,7 @@ async function run(octokit, context, token) {
 	endGroup();
 
 	startGroup(`[base] Build using ${packageManager}`);
-	await exec(`${packageManager} run ${buildScript}`);
+	await exec(`${packageManager} run ${inputs.buildScript}`);
 	endGroup();
 
 	// In case the build step alters a JSON-file, ....
@@ -152,7 +209,7 @@ async function run(octokit, context, token) {
 		...commentInfo,
 		body:
 			markdownDiff +
-			`\n\n<a href="https://github.com/preactjs/compressed-size-action"><sub>compressed-size-action${commentKey ? `::${commentKey}` : ''}</sub></a>`
+			`<a href="https://github.com/preactjs/compressed-size-action"><sub>compressed-size-action${commentKey ? `::${commentKey}` : ''}</sub></a>`
 	};
 
 	if (context.eventName !== 'pull_request' && context.eventName !== 'pull_request_target') {
@@ -268,9 +325,8 @@ async function createCheck(octokit, context) {
 
 (async () => {
 	try {
-		const token = getInput('repo-token');
-		const octokit = getOctokit(token);
-		await run(octokit, context, token);
+		const octokit = getOctokit(inputs.repoToken);
+		await run(octokit, context, inputs.repoToken);
 	} catch (e) {
 		setFailed(e.message);
 	}
