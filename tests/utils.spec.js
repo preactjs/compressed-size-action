@@ -47,13 +47,19 @@ test('diffTable', () => {
 			filename: 'four.js',
 			size: 4500,
 			delta: 9
-		}
+		},
+		{
+			filename: 'five.js',
+			size: 6500,
+			delta: 0
+		},
 	];
 	const defaultOptions = {
 		showTotal: true,
 		collapseUnchanged: true,
 		omitUnchanged: false,
-		minimumChangeThreshold: 1
+		minimumChangeThreshold: 1,
+		sortBy: /** @type {const} */ ('Filename:asc')
 	};
 
 	expect(diffTable(files, { ...defaultOptions })).toMatchSnapshot();
@@ -64,6 +70,10 @@ test('diffTable', () => {
 	expect(diffTable(files.map(file => ({...file, delta: 0})), { ...defaultOptions })).toMatchSnapshot();
 
 	expect(diffTable([files[2]], { ...defaultOptions })).toMatchSnapshot();
+
+	expect(diffTable(files, { ...defaultOptions, sortBy: 'Filename:desc' })).toMatchSnapshot();
+	expect(diffTable(files, { ...defaultOptions, sortBy: 'Size:asc' })).toMatchSnapshot();
+	expect(diffTable(files, { ...defaultOptions, sortBy: 'Change:desc' })).toMatchSnapshot();
 });
 
 test('getPackageManagerAndInstallScript', async () => {

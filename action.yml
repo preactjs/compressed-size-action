@@ -42,6 +42,9 @@ inputs:
     description: 'A custom working directory to execute the action in relative to repo root (defaults to .)'
   comment-key:
     description: 'Optional key to include in the bot comment to allow for multiple bundle calculations to be posted in separate comments.'
+  sort-by:
+    description: 'The column and direction to sort the results by. The format is "column:direction", where column is one of "Filename", "Size", or "Change" and direction is "asc" or "desc". For example, "Size:desc" sorts the table by file size in descending order.'
+    default: 'Filename:asc'
 
 runs:
   using: 'node20'

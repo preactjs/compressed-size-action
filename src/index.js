@@ -2,7 +2,7 @@ import { getInput, setFailed, startGroup, endGroup, debug } from '@actions/core'
 import { context, getOctokit } from '@actions/github';
 import { exec } from '@actions/exec';
 import SizePlugin from 'size-plugin-core';
-import { getPackageManagerAndInstallScript, diffTable, toBool, stripHash } from './utils.js';
+import { getPackageManagerAndInstallScript, diffTable, toBool, stripHash, getSortOrder } from './utils.js';
 
 /**
  * @typedef {ReturnType<typeof import("@actions/github").getOctokit>} Octokit
@@ -136,7 +136,8 @@ async function run(octokit, context, token) {
 		collapseUnchanged: toBool(getInput('collapse-unchanged')),
 		omitUnchanged: toBool(getInput('omit-unchanged')),
 		showTotal: toBool(getInput('show-total')),
-		minimumChangeThreshold: parseInt(getInput('minimum-change-threshold'), 10)
+		minimumChangeThreshold: parseInt(getInput('minimum-change-threshold'), 10),
+		sortBy: getSortOrder(getInput('sort-by')),
 	});
 
 	let outputRawMarkdown = false;
