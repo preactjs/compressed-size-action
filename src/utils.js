@@ -158,6 +158,12 @@ function markdownTable(rows) {
  */
 
 /**
+ * @typedef {'Filename' | 'Size' | 'Change'} DiffTableColumn
+ * @typedef {'asc' | 'desc'} SortOrder
+ * @typedef {`${DiffTableColumn}:${SortOrder}`} SortBy
+ */
+
+/**
  * Create a Markdown table showing diff data
  * @param {Diff[]} files
  * @param {object} options
@@ -165,10 +171,27 @@ function markdownTable(rows) {
  * @param {boolean} [options.collapseUnchanged]
  * @param {boolean} [options.omitUnchanged]
  * @param {number} [options.minimumChangeThreshold]
+ * @param {SortBy} [options.sortBy]
+ * @returns {string}
  */
-export function diffTable(files, { showTotal, collapseUnchanged, omitUnchanged, minimumChangeThreshold }) {
-	let changedRows = [];
-	let unChangedRows = [];
+export function diffTable(files, { showTotal, collapseUnchanged, omitUnchanged, minimumChangeThreshold, sortBy }) {
+	const changedRows = [],
+		unChangedRows = [];
+
+	const [sortByColumn, sortByDirection] = /** @type {[DiffTableColumn, SortOrder]} */ (sortBy.split(':'));
+
+	const columnIndex = {
+		Filename: 'filename',
+		Size: 'size',
+		Change: 'delta'
+	};
+
+	files.sort((a, b) => {
+		const idx = columnIndex[sortByColumn];
+		return sortByDirection === 'asc'
+			? a[idx].toString().localeCompare(b[idx].toString(), undefined, { numeric: true })
+			: b[idx].toString().localeCompare(a[idx].toString(), undefined, { numeric: true });
+	});
 
 	let totalSize = 0;
 	let totalDelta = 0;
@@ -182,16 +205,16 @@ export function diffTable(files, { showTotal, collapseUnchanged, omitUnchanged, 
 
 		if (isUnchanged && omitUnchanged) continue;
 
-		const columns = [
+		const row = [
 			`\`${filename}\``,
 			prettyBytes(size),
 			getDeltaText(delta, originalSize),
 			iconForDifference(delta, originalSize)
 		];
 		if (isUnchanged && collapseUnchanged) {
-			unChangedRows.push(columns);
+			unChangedRows.push(row);
 		} else {
-			changedRows.push(columns);
+			changedRows.push(row);
 		}
 	}
 
@@ -219,4 +242,20 @@ export function diffTable(files, { showTotal, collapseUnchanged, omitUnchanged, 
  */
 export function toBool(v) {
 	return /^(1|true|yes)$/.test(v);
+}
+
+/**
+ * @param {string} sortBy
+ * @returns {SortBy}
+ */
+export function getSortOrder(sortBy) {
+	const validColumns = ['Filename', 'Size', 'Change'];
+	const validDirections = ['asc', 'desc'];
+
+	const [column, direction] = sortBy.split(':');
+	if (validColumns.includes(column) && validDirections.includes(direction)) {
+		return /** @type {SortBy} */ (sortBy);
+	}
+	console.warn(`Invalid 'order-by' value '${sortBy}', defaulting to 'Filename:asc'`);
+	return 'Filename:asc';
 }
