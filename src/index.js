@@ -1,8 +1,10 @@
+// @ts-check
+
 import { getInput, setFailed, startGroup, endGroup, debug } from '@actions/core';
 import { context, getOctokit } from '@actions/github';
 import { exec } from '@actions/exec';
 import SizePlugin from 'size-plugin-core';
-import { getPackageManagerAndInstallScript, diffTable, toBool, stripHash, getSortOrder } from './utils.js';
+import { diffTable, toBool, stripHash, getSortOrder } from './utils.js';
 
 /**
  * @typedef {ReturnType<typeof import("@actions/github").getOctokit>} Octokit
@@ -17,7 +19,7 @@ async function run(octokit, context, token) {
 	// const pr = (await octokit.pulls.get({ owner, repo, pull_number })).data;
 	try {
 		debug('pr' + JSON.stringify(context.payload, null, 2));
-	} catch (e) {}
+	} catch (e) { }
 
 	let baseSha, baseRef;
 	if (context.eventName == 'push') {
@@ -27,8 +29,8 @@ async function run(octokit, context, token) {
 		console.log(`Pushed new commit on top of ${baseRef} (${baseSha})`);
 	} else if (context.eventName == 'pull_request' || context.eventName == 'pull_request_target') {
 		const pr = context.payload.pull_request;
-		baseSha = pr.base.sha;
-		baseRef = pr.base.ref;
+		baseSha = pr?.base.sha;
+		baseRef = pr?.base.ref;
 
 		console.log(`PR #${pull_number} is targeted at ${baseRef} (${baseRef})`);
 	} else {
@@ -46,22 +48,17 @@ async function run(octokit, context, token) {
 		stripHash: stripHash(getInput('strip-hash'))
 	});
 
-	const buildScript = getInput('build-script') || 'build';
+	const buildScript = getInput('build-script', { required: true });
 	const cwd = process.cwd();
 
-	let { packageManager, installScript } = await getPackageManagerAndInstallScript(cwd);
-	if (getInput('install-script')) {
-		installScript = getInput('install-script');
-	}
+	const installScript = getInput('install-script', { required: true });
 
 	startGroup(`[current] Install Dependencies`);
-	console.log(`Installing using ${installScript}`);
 	await exec(installScript);
 	endGroup();
 
-	startGroup(`[current] Build using ${packageManager}`);
-	console.log(`Building using ${packageManager} run ${buildScript}`);
-	await exec(`${packageManager} run ${buildScript}`);
+	startGroup(`[current] Building`);
+	await exec(buildScript);
 	endGroup();
 
 	// In case the build step alters a JSON-file, ....
@@ -98,26 +95,20 @@ async function run(octokit, context, token) {
 	}
 	endGroup();
 
+	/** @type {string|undefined} */
 	const cleanScript = getInput('clean-script');
 	if (cleanScript) {
-		startGroup(`[base] Cleanup via ${packageManager} run ${cleanScript}`);
-		await exec(`${packageManager} run ${cleanScript}`);
+		startGroup(`[base] Cleanup`);
+		await exec(cleanScript);
 		endGroup();
 	}
 
 	startGroup(`[base] Install Dependencies`);
-
-	({ packageManager, installScript } = await getPackageManagerAndInstallScript(cwd));
-	if (getInput('install-script')) {
-		installScript = getInput('install-script');
-	}
-
-	console.log(`Installing using ${installScript}`);
 	await exec(installScript);
 	endGroup();
 
-	startGroup(`[base] Build using ${packageManager}`);
-	await exec(`${packageManager} run ${buildScript}`);
+	startGroup(`[base] Building`);
+	await exec(buildScript);
 	endGroup();
 
 	// In case the build step alters a JSON-file, ....
@@ -178,9 +169,9 @@ async function run(octokit, context, token) {
 		try {
 			const comments = (await octokit.issues.listComments(commentInfo)).data;
 			const commentRegExp = new RegExp(`<sub>[\s\n]*(compressed|gzip)-size-action${commentKey ? `::${commentKey}` : ''}</sub>`)
-			for (let i = comments.length; i--; ) {
+			for (let i = comments.length; i--;) {
 				const c = comments[i];
-				if (commentRegExp.test(c.body)) {
+				if (c.body && commentRegExp.test(c.body)) {
 					commentId = c.id;
 					break;
 				}
@@ -252,10 +243,11 @@ async function createCheck(octokit, context) {
 	const check = await octokit.checks.create({
 		...context.repo,
 		name: 'Compressed Size',
-		head_sha: context.payload.pull_request.head.sha,
+		head_sha: context.payload.pull_request?.head.sha,
 		status: 'in_progress'
 	});
 
+	/** @param {object} details */
 	return async (details) => {
 		await octokit.checks.update({
 			...context.repo,

@@ -2,7 +2,7 @@
 
 A GitHub action that reports changes in compressed file sizes on your PRs.
 
-- Automatically uses `yarn`, `pnpm`, `bun`, or `npm ci` when lockfiles are present
+- Bring your own toolchain by using clean, install, and build scripts
 - Builds your PR, then builds the target and compares between the two
 - Doesn't upload anything or rely on centralized storage
 - Supports [custom build scripts](#customizing-the-build) and [file patterns](#customizing-the-list-of-files)
@@ -26,7 +26,11 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-      - uses: preactjs/compressed-size-action@v2
+      - uses: preactjs/compressed-size-action@v3
+        with:
+          install-script: npm ci
+          build-script: npm run build
+          clean-script: npm run clean
 ```
 
 ### Customizing the Installation
