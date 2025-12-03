@@ -33,6 +33,9 @@ jobs:
           clean-script: npm run clean
 ```
 
+> [!IMPORTANT]
+> When using custom `build-script`, `install-script`, or `clean-script` options, ensure that the specified scripts exist in both the current branch (PR) and the base branch (target). The action will fail if a script is missing from either branch.
+
 ### Customizing the Installation
 
 By default, `compressed-size-action` will install dependencies according to which lockfiles are present, if any. However, if you need to run a different installation command, you can pass a custom script to do so. For example, to use `npm ci` with the `--workspace` option:
