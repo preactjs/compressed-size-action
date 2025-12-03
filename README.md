@@ -89,7 +89,7 @@ jobs:
     - uses: actions/checkout@v2
     - uses: preactjs/compressed-size-action@v3
       with:
-+       build-script: "ci"
++       build-script: "npm run build"
 ```
 
 #### Clean up state between builds
@@ -107,7 +107,7 @@ jobs:
     - uses: preactjs/compressed-size-action@v3
       with:
         repo-token: "${{ secrets.GITHUB_TOKEN }}"
-+       clean-script: "clean"
++       clean-script: "npm run clean"
 ```
 
 ```jsonc
