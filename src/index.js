@@ -1,5 +1,3 @@
-// @ts-check
-
 import { getInput, setFailed, startGroup, endGroup, debug } from '@actions/core';
 import { context, getOctokit } from '@actions/github';
 import { exec } from '@actions/exec';
@@ -19,7 +17,7 @@ async function run(octokit, context, token) {
 	// const pr = (await octokit.pulls.get({ owner, repo, pull_number })).data;
 	try {
 		debug('pr' + JSON.stringify(context.payload, null, 2));
-	} catch (e) { }
+	} catch (e) {}
 
 	let baseSha, baseRef;
 	if (context.eventName == 'push') {
@@ -29,8 +27,8 @@ async function run(octokit, context, token) {
 		console.log(`Pushed new commit on top of ${baseRef} (${baseSha})`);
 	} else if (context.eventName == 'pull_request' || context.eventName == 'pull_request_target') {
 		const pr = context.payload.pull_request;
-		baseSha = pr?.base.sha;
-		baseRef = pr?.base.ref;
+		baseSha = pr.base.sha;
+		baseRef = pr.base.ref;
 
 		console.log(`PR #${pull_number} is targeted at ${baseRef} (${baseRef})`);
 	} else {
@@ -97,7 +95,6 @@ async function run(octokit, context, token) {
 	}
 	endGroup();
 
-	/** @type {string|undefined} */
 	const cleanScript = getInput('clean-script');
 	if (cleanScript) {
 		startGroup(`[base] Cleanup`);
@@ -175,7 +172,7 @@ async function run(octokit, context, token) {
 			const commentRegExp = new RegExp(`<sub>[\s\n]*(compressed|gzip)-size-action${commentKey ? `::${commentKey}` : ''}</sub>`)
 			for (let i = comments.length; i--;) {
 				const c = comments[i];
-				if (c.body && commentRegExp.test(c.body)) {
+				if (commentRegExp.test(c.body)) {
 					commentId = c.id;
 					break;
 				}
@@ -247,11 +244,10 @@ async function createCheck(octokit, context) {
 	const check = await octokit.checks.create({
 		...context.repo,
 		name: 'Compressed Size',
-		head_sha: context.payload.pull_request?.head.sha,
+		head_sha: context.payload.pull_request.head.sha,
 		status: 'in_progress'
 	});
 
-	/** @param {object} details */
 	return async (details) => {
 		await octokit.checks.update({
 			...context.repo,

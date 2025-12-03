@@ -1,3 +1,4 @@
+import path from 'path';
 import { toBool, getDeltaText, iconForDifference, diffTable, fileExists, stripHash } from '../src/utils.js';
 
 test('toBool', () => {
@@ -66,7 +67,7 @@ test('diffTable', () => {
 	expect(diffTable(files, { ...defaultOptions, collapseUnchanged: false })).toMatchSnapshot();
 	expect(diffTable(files, { ...defaultOptions, omitUnchanged: true })).toMatchSnapshot();
 	expect(diffTable(files, { ...defaultOptions, minimumChangeThreshold: 10 })).toMatchSnapshot();
-	expect(diffTable(files.map(file => ({ ...file, delta: 0 })), { ...defaultOptions })).toMatchSnapshot();
+	expect(diffTable(files.map(file => ({...file, delta: 0})), { ...defaultOptions })).toMatchSnapshot();
 
 	expect(diffTable([files[2]], { ...defaultOptions })).toMatchSnapshot();
 

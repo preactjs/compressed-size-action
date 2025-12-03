@@ -9,7 +9,7 @@ export async function fileExists(filename) {
 	try {
 		await fs.promises.access(filename, fs.constants.F_OK);
 		return true;
-	} catch (e) { }
+	} catch (e) {}
 	return false;
 }
 

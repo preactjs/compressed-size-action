@@ -1,13 +1,11 @@
 {
   "compilerOptions": {
     "target": "ESNext",
-    "module": "nodenext",
+    "module": "ESNext",
     "moduleResolution": "NodeNext",
     "allowJs": true,
     "checkJs": true,
     "resolveJsonModule": true,
-    "noEmit": true,
-    "strict": true,
-    "useUnknownInCatchVariables": false
+    "noEmit": true
   }
 }
