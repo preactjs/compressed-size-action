@@ -51,11 +51,13 @@ async function run(octokit, context, token) {
 	const buildScript = getInput('build-script', { required: true });
 	const cwd = process.cwd();
 
-	const installScript = getInput('install-script', { required: true });
+	const installScript = getInput('install-script');
 
-	startGroup(`[current] Install Dependencies`);
-	await exec(installScript);
-	endGroup();
+	if (installScript) {
+		startGroup(`[current] Install Dependencies`);
+		await exec(installScript);
+		endGroup();
+	}
 
 	startGroup(`[current] Building`);
 	await exec(buildScript);
@@ -103,9 +105,11 @@ async function run(octokit, context, token) {
 		endGroup();
 	}
 
-	startGroup(`[base] Install Dependencies`);
-	await exec(installScript);
-	endGroup();
+	if (installScript) {
+		startGroup(`[base] Install Dependencies`);
+		await exec(installScript);
+		endGroup();
+	}
 
 	startGroup(`[base] Building`);
 	await exec(buildScript);

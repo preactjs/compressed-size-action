@@ -12,7 +12,6 @@ inputs:
   clean-script:
     description: 'A script that cleans/resets state between branch builds'
   install-script:
-    required: true
     description: 'Custom installation script to run to set up the dependencies in your project'
   build-script:
     required: true
