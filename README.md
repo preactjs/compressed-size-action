@@ -48,7 +48,7 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - uses: preactjs/compressed-size-action@v2
+    - uses: preactjs/compressed-size-action@v3
       with:
 +       install-script: "npm ci --workspace=packages/my-subpackage"
 ```
@@ -84,7 +84,7 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - uses: preactjs/compressed-size-action@v2
+    - uses: preactjs/compressed-size-action@v3
       with:
 +       build-script: "ci"
 ```
@@ -101,7 +101,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-    - uses: preactjs/compressed-size-action@v2
+    - uses: preactjs/compressed-size-action@v3
       with:
         repo-token: "${{ secrets.GITHUB_TOKEN }}"
 +       clean-script: "clean"
@@ -131,7 +131,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-    - uses: preactjs/compressed-size-action@v2
+    - uses: preactjs/compressed-size-action@v3
       with:
 +       order-by: "Size:desc"
 ```
@@ -150,7 +150,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-    - uses: preactjs/compressed-size-action@v2
+    - uses: preactjs/compressed-size-action@v3
       with:
 +       pattern: "./build-output/**/*.{js,css,html,json}"
 +       exclude: "{./build-output/manifest.json,**/*.map,**/node_modules/**}"
@@ -215,7 +215,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-    - uses: preactjs/compressed-size-action@v2
+    - uses: preactjs/compressed-size-action@v3
       with:
         build-script: "build:modern"
 +       comment-key: modern
@@ -224,7 +224,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-    - uses: preactjs/compressed-size-action@v2
+    - uses: preactjs/compressed-size-action@v3
       with:
         build-script: "build:legacy"
 +       comment-key: legacy
