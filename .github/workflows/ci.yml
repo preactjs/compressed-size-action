@@ -17,3 +17,5 @@ jobs:
         with:
           repo-token: "${{ secrets.GITHUB_TOKEN }}"
           pattern: index.js
+          install-script: npm ci
+          build-script: npm run build
