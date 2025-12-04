@@ -2,7 +2,6 @@
 
 A GitHub action that reports changes in compressed file sizes on your PRs.
 
-- Bring your own toolchain by using clean, install, and build scripts
 - Builds your PR, then builds the target and compares between the two
 - Doesn't upload anything or rely on centralized storage
 - Supports [custom build scripts](#customizing-the-build) and [file patterns](#customizing-the-list-of-files)
@@ -26,7 +25,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-      - uses: preactjs/compressed-size-action@v3
+      - uses: preactjs/compressed-size-action@v2
         with:
           install-script: npm ci
           build-script: npm run build
@@ -51,7 +50,7 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - uses: preactjs/compressed-size-action@v3
+    - uses: preactjs/compressed-size-action@v2
       with:
 +       install-script: "npm ci --workspace=packages/my-subpackage"
 ```
@@ -87,7 +86,7 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - uses: preactjs/compressed-size-action@v3
+    - uses: preactjs/compressed-size-action@v2
       with:
 +       build-script: "npm run build"
 ```
@@ -104,7 +103,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-    - uses: preactjs/compressed-size-action@v3
+    - uses: preactjs/compressed-size-action@v2
       with:
         repo-token: "${{ secrets.GITHUB_TOKEN }}"
 +       clean-script: "npm run clean"
@@ -134,7 +133,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-    - uses: preactjs/compressed-size-action@v3
+    - uses: preactjs/compressed-size-action@v2
       with:
 +       order-by: "Size:desc"
 ```
@@ -153,7 +152,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-    - uses: preactjs/compressed-size-action@v3
+    - uses: preactjs/compressed-size-action@v2
       with:
 +       pattern: "./build-output/**/*.{js,css,html,json}"
 +       exclude: "{./build-output/manifest.json,**/*.map,**/node_modules/**}"
@@ -218,7 +217,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-    - uses: preactjs/compressed-size-action@v3
+    - uses: preactjs/compressed-size-action@v2
       with:
         build-script: "build:modern"
 +       comment-key: modern
@@ -227,7 +226,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-    - uses: preactjs/compressed-size-action@v3
+    - uses: preactjs/compressed-size-action@v2
       with:
         build-script: "build:legacy"
 +       comment-key: legacy

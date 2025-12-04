@@ -53,11 +53,13 @@ async function run(octokit, context, token) {
 
 	if (installScript) {
 		startGroup(`[current] Install Dependencies`);
+		console.log(`Running install script: "${installScript}"`);
 		await exec(installScript);
 		endGroup();
 	}
 
 	startGroup(`[current] Building`);
+	console.log(`Running build script: "${buildScript}"`);
 	await exec(buildScript);
 	endGroup();
 
@@ -98,17 +100,20 @@ async function run(octokit, context, token) {
 	const cleanScript = getInput('clean-script');
 	if (cleanScript) {
 		startGroup(`[base] Cleanup`);
+		console.log(`Running clean script: "${cleanScript}"`);
 		await exec(cleanScript);
 		endGroup();
 	}
 
 	if (installScript) {
 		startGroup(`[base] Install Dependencies`);
+		console.log(`Running install script: "${installScript}"`);
 		await exec(installScript);
 		endGroup();
 	}
 
 	startGroup(`[base] Building`);
+	console.log(`Running build script: "${buildScript}"`);
 	await exec(buildScript);
 	endGroup();
 
@@ -170,7 +175,7 @@ async function run(octokit, context, token) {
 		try {
 			const comments = (await octokit.issues.listComments(commentInfo)).data;
 			const commentRegExp = new RegExp(`<sub>[\s\n]*(compressed|gzip)-size-action${commentKey ? `::${commentKey}` : ''}</sub>`)
-			for (let i = comments.length; i--;) {
+			for (let i = comments.length; i--; ) {
 				const c = comments[i];
 				if (commentRegExp.test(c.body)) {
 					commentId = c.id;
