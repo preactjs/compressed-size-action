@@ -1,41 +1,5 @@
 import fs from 'fs';
-import path from 'path';
 import prettyBytes from 'pretty-bytes';
-
-/**
- * @param {string} cwd
- * @returns {Promise<{ packageManager: string, installScript: string }>}
- */
-export async function getPackageManagerAndInstallScript(cwd) {
-	const [yarnLockExists, pnpmLockExists, bunLockBinaryExists, bunLockExists, packageLockExists, denoLockExists] = await Promise.all([
-		fileExists(path.resolve(cwd, 'yarn.lock')),
-		fileExists(path.resolve(cwd, 'pnpm-lock.yaml')),
-		fileExists(path.resolve(cwd, 'bun.lockb')),
-		fileExists(path.resolve(cwd, 'bun.lock')),
-		fileExists(path.resolve(cwd, 'package-lock.json')),
-		fileExists(path.resolve(cwd, 'deno.lock')),
-	]);
-
-	let packageManager = 'npm';
-	let installScript = 'npm install';
-	if (yarnLockExists) {
-		installScript = 'yarn --frozen-lockfile';
-		packageManager = 'yarn';
-	} else if (pnpmLockExists) {
-		installScript = 'pnpm install --frozen-lockfile';
-		packageManager = 'pnpm';
-	} else if (bunLockBinaryExists || bunLockExists) {
-		installScript = 'bun install --frozen-lockfile';
-		packageManager = 'bun';
-	} else if (denoLockExists) {
-		installScript = 'deno install --frozen';
-		packageManager = 'deno';
-	} else if (packageLockExists) {
-		installScript = 'npm ci';
-	}
-
-	return { packageManager, installScript };
-}
 
 /**
  * Check if a given file exists and can be accessed.
@@ -224,7 +188,7 @@ export function diffTable(files, { showTotal, collapseUnchanged, omitUnchanged, 
 	}
 
 	let out = '';
-	
+
 	if (changedRows.length !== 0) {
 		const outChanged = markdownTable(changedRows);
 		out = `<details open><summary>📦 <strong>View Changed</strong></summary>\n\n${outChanged}\n\n</details>`;

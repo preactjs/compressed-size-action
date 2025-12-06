@@ -2,7 +2,6 @@
 
 A GitHub action that reports changes in compressed file sizes on your PRs.
 
-- Automatically uses `yarn`, `pnpm`, `bun`, `deno`, or `npm ci` when lockfiles are present
 - Builds your PR, then builds the target and compares between the two
 - Doesn't upload anything or rely on centralized storage
 - Supports [custom build scripts](#customizing-the-build) and [file patterns](#customizing-the-list-of-files)
@@ -27,6 +26,10 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: preactjs/compressed-size-action@v2
+        with:
+          install-script: npm ci
+          build-script: npm run build
+          clean-script: npm run clean
 ```
 
 > **Note:** Due to GitHub's permission model, this action cannot safely create comments when it is triggered by a PR from a fork. It will, however, still generate the size comparison and print the comment it would've posted to the stdout of the action, allowing manual checking and you can copy/paste it into a comment if you wish.
@@ -84,7 +87,7 @@ jobs:
     - uses: actions/checkout@v2
     - uses: preactjs/compressed-size-action@v2
       with:
-+       build-script: "ci"
++       build-script: "npm run build"
 ```
 
 #### Clean up state between builds
@@ -102,7 +105,7 @@ jobs:
     - uses: preactjs/compressed-size-action@v2
       with:
         repo-token: "${{ secrets.GITHUB_TOKEN }}"
-+       clean-script: "clean"
++       clean-script: "npm run clean"
 ```
 
 ```jsonc
