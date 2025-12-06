@@ -1,5 +1,5 @@
 import path from 'path';
-import { toBool, getDeltaText, iconForDifference, diffTable, getPackageManagerAndInstallScript, fileExists, stripHash } from '../src/utils.js';
+import { toBool, getDeltaText, iconForDifference, diffTable, fileExists, stripHash } from '../src/utils.js';
 
 test('toBool', () => {
 	expect(toBool('1')).toBe(true);
@@ -74,18 +74,6 @@ test('diffTable', () => {
 	expect(diffTable(files, { ...defaultOptions, sortBy: 'Filename:desc' })).toMatchSnapshot();
 	expect(diffTable(files, { ...defaultOptions, sortBy: 'Size:asc' })).toMatchSnapshot();
 	expect(diffTable(files, { ...defaultOptions, sortBy: 'Change:desc' })).toMatchSnapshot();
-});
-
-test('getPackageManagerAndInstallScript', async () => {
-	let cwd = process.cwd();
-	let { packageManager, installScript } = await getPackageManagerAndInstallScript(cwd);
-	expect(packageManager).toBe('npm');
-	expect(installScript).toBe('npm ci');
-
-	cwd = path.join(cwd, 'tests');
-	({ packageManager, installScript } = await getPackageManagerAndInstallScript(cwd));
-	expect(packageManager).toBe('npm');
-	expect(installScript).toBe('npm install');
 });
 
 test('fileExists', async () => {

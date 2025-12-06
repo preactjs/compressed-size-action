@@ -10,13 +10,12 @@ inputs:
     required: false
     default: ${{ github.token }}
   clean-script:
-    description: 'An npm-script that cleans/resets state between branch builds'
+    description: 'A script that cleans/resets state between branch builds'
   install-script:
-    required: false
     description: 'Custom installation script to run to set up the dependencies in your project'
   build-script:
-    description: 'The npm-script to run that builds your project'
-    default: 'build'
+    required: true
+    description: 'The script to run that builds your project'
   compression:
     description: 'The compression algorithm to use: "gzip" or "brotli"'
   show-total:

@@ -2,7 +2,7 @@ import { getInput, setFailed, startGroup, endGroup, debug } from '@actions/core'
 import { context, getOctokit } from '@actions/github';
 import { exec } from '@actions/exec';
 import SizePlugin from 'size-plugin-core';
-import { getPackageManagerAndInstallScript, diffTable, toBool, stripHash, getSortOrder } from './utils.js';
+import { diffTable, toBool, stripHash, getSortOrder } from './utils.js';
 
 /**
  * @typedef {ReturnType<typeof import("@actions/github").getOctokit>} Octokit
@@ -46,22 +46,21 @@ async function run(octokit, context, token) {
 		stripHash: stripHash(getInput('strip-hash'))
 	});
 
-	const buildScript = getInput('build-script') || 'build';
+	const buildScript = getInput('build-script', { required: true });
 	const cwd = process.cwd();
 
-	let { packageManager, installScript } = await getPackageManagerAndInstallScript(cwd);
-	if (getInput('install-script')) {
-		installScript = getInput('install-script');
+	const installScript = getInput('install-script');
+
+	if (installScript) {
+		startGroup(`[current] Install Dependencies`);
+		console.log(`Running install script: "${installScript}"`);
+		await exec(installScript);
+		endGroup();
 	}
 
-	startGroup(`[current] Install Dependencies`);
-	console.log(`Installing using ${installScript}`);
-	await exec(installScript);
-	endGroup();
-
-	startGroup(`[current] Build using ${packageManager}`);
-	console.log(`Building using ${packageManager} run ${buildScript}`);
-	await exec(`${packageManager} run ${buildScript}`);
+	startGroup(`[current] Building`);
+	console.log(`Running build script: "${buildScript}"`);
+	await exec(buildScript);
 	endGroup();
 
 	// In case the build step alters a JSON-file, ....
@@ -100,24 +99,22 @@ async function run(octokit, context, token) {
 
 	const cleanScript = getInput('clean-script');
 	if (cleanScript) {
-		startGroup(`[base] Cleanup via ${packageManager} run ${cleanScript}`);
-		await exec(`${packageManager} run ${cleanScript}`);
+		startGroup(`[base] Cleanup`);
+		console.log(`Running clean script: "${cleanScript}"`);
+		await exec(cleanScript);
 		endGroup();
 	}
 
-	startGroup(`[base] Install Dependencies`);
-
-	({ packageManager, installScript } = await getPackageManagerAndInstallScript(cwd));
-	if (getInput('install-script')) {
-		installScript = getInput('install-script');
+	if (installScript) {
+		startGroup(`[base] Install Dependencies`);
+		console.log(`Running install script: "${installScript}"`);
+		await exec(installScript);
+		endGroup();
 	}
 
-	console.log(`Installing using ${installScript}`);
-	await exec(installScript);
-	endGroup();
-
-	startGroup(`[base] Build using ${packageManager}`);
-	await exec(`${packageManager} run ${buildScript}`);
+	startGroup(`[base] Building`);
+	console.log(`Running build script: "${buildScript}"`);
+	await exec(buildScript);
 	endGroup();
 
 	// In case the build step alters a JSON-file, ....
