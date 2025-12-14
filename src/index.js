@@ -89,6 +89,13 @@ async function run(octokit, context, token) {
 		}
 	}
 
+	const cleanScript = getInput('clean-script');
+	if (cleanScript) {
+		startGroup(`[target] Cleanup via ${packageManager} run ${cleanScript}`);
+		await exec(`${packageManager} run ${cleanScript}`);
+		endGroup();
+	}
+
 	console.log('checking out and building base commit');
 	try {
 		if (!baseRef) throw Error('missing context.payload.base.ref');
@@ -98,12 +105,6 @@ async function run(octokit, context, token) {
 	}
 	endGroup();
 
-	const cleanScript = getInput('clean-script');
-	if (cleanScript) {
-		startGroup(`[base] Cleanup via ${packageManager} run ${cleanScript}`);
-		await exec(`${packageManager} run ${cleanScript}`);
-		endGroup();
-	}
 
 	startGroup(`[base] Install Dependencies`);
 
