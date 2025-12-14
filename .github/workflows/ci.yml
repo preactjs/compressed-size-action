@@ -16,4 +16,4 @@ jobs:
         uses: ./
         with:
           repo-token: "${{ secrets.GITHUB_TOKEN }}"
-          pattern: index.js
+          pattern: "*.js"
