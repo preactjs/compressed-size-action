@@ -202,6 +202,7 @@ export function diffTable(files, { showTotal, collapseUnchanged, omitUnchanged, 
 
 		const originalSize = size - delta;
 		const isUnchanged = Math.abs(delta) < minimumChangeThreshold;
+		console.log('minimumChangeThreshold:', minimumChangeThreshold);
 		console.log({ filename, size, delta, originalSize, isUnchanged });
 
 		if (isUnchanged && omitUnchanged) continue;
