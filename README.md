@@ -117,7 +117,7 @@ jobs:
 
 ### Sorting the list of files
 
-By default, the results table is sorted by filename in ascending order. You can customize this behavior using the `order-by` option:
+By default, the results table is sorted by filename in ascending order. You can customize this behavior using the `sort-by` option:
 
 ```diff
 name: Compressed Size
@@ -129,7 +129,7 @@ jobs:
     - uses: actions/checkout@v2
     - uses: preactjs/compressed-size-action@v2
       with:
-+       order-by: "Size:desc"
++       sort-by: "Size:desc"
 ```
 
 The format is "column:direction", where column is one of "Filename", "Size", or "Change" and direction is "asc" or "desc". For example, "Size:desc" sorts the table by file size in descending order.
