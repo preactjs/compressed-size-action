@@ -46,7 +46,6 @@ async function run(octokit, context, token) {
 		stripHash: stripHash(getInput('strip-hash'))
 	});
 
-	const buildScript = getInput('build-script') || 'build';
 	const cwd = process.cwd();
 
 	let { packageManager, installScript } = await getPackageManagerAndInstallScript(cwd);
@@ -54,14 +53,16 @@ async function run(octokit, context, token) {
 		installScript = getInput('install-script');
 	}
 
+	const buildScript = getInput('build-script') || `${packageManager} run build`;
+
 	startGroup(`[current] Install Dependencies`);
 	console.log(`Installing using ${installScript}`);
 	await exec(installScript);
 	endGroup();
 
 	startGroup(`[current] Build using ${packageManager}`);
-	console.log(`Building using ${packageManager} run ${buildScript}`);
-	await exec(`${packageManager} run ${buildScript}`);
+	console.log(`Building using ${buildScript}`);
+	await exec(buildScript);
 	endGroup();
 
 	// In case the build step alters a JSON-file, ....
