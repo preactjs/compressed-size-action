@@ -70,9 +70,19 @@ async function run(octokit, context, token) {
 
 	const newSizes = await plugin.readFromDisk(cwd);
 
+	function throwIfBaseRefMissing() {
+		if (!baseRef) {
+			if (context.eventName == 'push') {
+				throw new Error('missing context.payload.base.ref for push event');
+			} else {
+				throw new Error('missing context.payload.pull_request.base.ref for pull_request event');
+			}
+		}
+	}
+
 	startGroup(`[base] Checkout target branch`);
 	try {
-		if (!baseRef) throw Error('missing context.payload.pull_request.base.ref');
+		throwIfBaseRefMissing();
 		await exec(`git fetch -n origin ${baseRef}:${baseRef}`);
 		console.log('successfully fetched base.ref');
 	} catch (e) {
@@ -99,7 +109,7 @@ async function run(octokit, context, token) {
 
 	console.log('checking out and building base commit');
 	try {
-		if (!baseRef) throw Error('missing context.payload.base.ref');
+		throwIfBaseRefMissing();
 		await exec(`git reset --hard ${baseRef}`);
 	} catch (e) {
 		await exec(`git reset --hard ${baseSha}`);
