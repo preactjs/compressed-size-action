@@ -218,7 +218,12 @@ export function diffTable(files, { showTotal, collapseUnchanged, omitUnchanged, 
 		}
 	}
 
-	let out = markdownTable(changedRows);
+	let out = '';
+	
+	if (changedRows.length !== 0) {
+		const outChanged = markdownTable(changedRows);
+		out = `<details open><summary>📦 <strong>View Changed</strong></summary>\n\n${outChanged}\n\n</details>`;
+	}
 
 	if (unChangedRows.length !== 0) {
 		const outUnchanged = markdownTable(unChangedRows);
