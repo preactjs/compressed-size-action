@@ -13,12 +13,12 @@
     "@actions/github": "^4.0.0",
     "@babel/core": "^7.29.0",
     "@babel/preset-env": "^7.29.0",
+    "@rschristian/size-plugin": "^0.1.0",
     "@types/jest": "^26.0.19",
     "babel-jest": "^26.6.3",
     "jest": "^26.6.3",
     "microbundle": "^0.15.1",
-    "pretty-bytes": "^5.4.1",
-    "size-plugin-core": "0.0.9"
+    "pretty-bytes": "^5.4.1"
   },
   "prettier": {
     "useTabs": true,
