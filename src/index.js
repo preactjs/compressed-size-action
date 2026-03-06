@@ -64,10 +64,10 @@ async function run(octokit, context, token) {
 	await exec(`${packageManager} run ${buildScript}`);
 	endGroup();
 
+	const newSizes = await plugin.readFromDisk(cwd);
+
 	// In case the build step alters a JSON-file, ....
 	await exec(`git reset --hard`);
-
-	const newSizes = await plugin.readFromDisk(cwd);
 
 	startGroup(`[base] Checkout target branch`);
 	try {
