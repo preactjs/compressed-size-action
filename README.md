@@ -1,5 +1,8 @@
 # compressed-size-action
 
+> [!CAUTION]
+> This action cannot post comments on pull requests coming from a fork (i.e. coming from outside your organization) due to GitHub's token permission model, see [#54](https://github.com/preactjs/compressed-size-action/issues/54) for more info.
+
 A GitHub action that reports changes in compressed file sizes on your PRs.
 
 - Automatically uses `yarn`, `pnpm`, `bun`, or `npm ci` when lockfiles are present
