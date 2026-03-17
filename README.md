@@ -11,7 +11,7 @@ A GitHub action that reports changes in compressed file sizes on your PRs.
 
 <img width="600" src="https://user-images.githubusercontent.com/105127/73027489-8413c900-3e01-11ea-8630-09172b247f82.png">
 
-### Usage:
+### Usage [Internal PRs in same repo]:
 
 Add a workflow (`.github/workflows/main.yml`):
 
@@ -28,6 +28,13 @@ jobs:
       - uses: actions/checkout@v2
       - uses: preactjs/compressed-size-action@v2
 ```
+
+### Usage [External PRs from forks]:
+
+There is no secure way to run this action as a single step when comparing an external PR from a fork, as it would need `pull_request_target` 
+permission to post the comment.  See #54 for more info, there is a two step workaround possible whereby a json artifact is generated in a
+first step (pull_request), and posted as a comment in the forked pr in the second step (pull_request_target).
+
 
 ### Customizing the Installation
 
