@@ -198,10 +198,11 @@ export function diffTable(files, { showTotal, collapseUnchanged, omitUnchanged, 
 	for (const file of files) {
 		const { filename, size, delta } = file;
 		totalSize += size;
-		totalDelta += delta;
 
 		const originalSize = size - delta;
 		const isUnchanged = Math.abs(delta) < minimumChangeThreshold;
+
+		if (!isUnchanged) totalDelta += delta;
 
 		if (isUnchanged && omitUnchanged) continue;
 
