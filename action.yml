@@ -19,6 +19,7 @@ inputs:
     default: 'build'
   compression:
     description: 'The compression algorithm to use: "gzip" or "brotli"'
+    default: 'gzip'
   show-total:
     description: 'Show total size and difference.'
     default: 'true'
@@ -47,5 +48,5 @@ inputs:
     default: 'Filename:asc'
 
 runs:
-  using: 'node20'
+  using: 'node24'
   main: 'index.js'

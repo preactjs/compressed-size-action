@@ -1,7 +1,7 @@
 import { getInput, setFailed, startGroup, endGroup, debug } from '@actions/core';
 import { context, getOctokit } from '@actions/github';
 import { exec } from '@actions/exec';
-import SizePlugin from 'size-plugin-core';
+import { SizePlugin } from '@rschristian/size-plugin';
 import { getPackageManagerAndInstallScript, diffTable, toBool, stripHash, getSortOrder } from './utils.js';
 
 /**
@@ -40,7 +40,7 @@ async function run(octokit, context, token) {
 	if (getInput('cwd')) process.chdir(getInput('cwd'));
 
 	const plugin = new SizePlugin({
-		compression: getInput('compression'),
+		compression: /** @type {'gzip' | 'brotli'} */ (getInput('compression')),
 		pattern: getInput('pattern') || '**/dist/**/*.{js,mjs,cjs}',
 		exclude: getInput('exclude') || '{**/*.map,**/node_modules/**}',
 		stripHash: stripHash(getInput('strip-hash'))
@@ -64,10 +64,10 @@ async function run(octokit, context, token) {
 	await exec(`${packageManager} run ${buildScript}`);
 	endGroup();
 
+	const newSizes = await plugin.readFromDisk(cwd);
+
 	// In case the build step alters a JSON-file, ....
 	await exec(`git reset --hard`);
-
-	const newSizes = await plugin.readFromDisk(cwd);
 
 	startGroup(`[base] Checkout target branch`);
 	try {
