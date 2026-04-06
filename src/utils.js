@@ -30,7 +30,8 @@ export async function getPackageManagerAndInstallScript(cwd) {
 	} else if (packageLockExists) {
 		installScript = 'npm ci';
 	} else if (denoLockExists) {
-		installScript = 'deno install --frozen'
+		installScript = 'deno install --frozen';
+		packageManager = 'deno';
 	}
 
 	return { packageManager, installScript };
