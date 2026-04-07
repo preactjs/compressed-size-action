@@ -27,11 +27,11 @@ export async function getPackageManagerAndInstallScript(cwd) {
 	} else if (bunLockBinaryExists || bunLockExists) {
 		installScript = 'bun install --frozen-lockfile';
 		packageManager = 'bun';
-	} else if (packageLockExists) {
-		installScript = 'npm ci';
 	} else if (denoLockExists) {
 		installScript = 'deno install --frozen';
 		packageManager = 'deno';
+	} else if (packageLockExists) {
+		installScript = 'npm ci';
 	}
 
 	return { packageManager, installScript };
