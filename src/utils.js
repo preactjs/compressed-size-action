@@ -7,12 +7,13 @@ import prettyBytes from 'pretty-bytes';
  * @returns {Promise<{ packageManager: string, installScript: string }>}
  */
 export async function getPackageManagerAndInstallScript(cwd) {
-	const [yarnLockExists, pnpmLockExists, bunLockBinaryExists, bunLockExists, packageLockExists] = await Promise.all([
+	const [yarnLockExists, pnpmLockExists, bunLockBinaryExists, bunLockExists, packageLockExists, denoLockExists] = await Promise.all([
 		fileExists(path.resolve(cwd, 'yarn.lock')),
 		fileExists(path.resolve(cwd, 'pnpm-lock.yaml')),
 		fileExists(path.resolve(cwd, 'bun.lockb')),
 		fileExists(path.resolve(cwd, 'bun.lock')),
 		fileExists(path.resolve(cwd, 'package-lock.json')),
+		fileExists(path.resolve(cwd, 'deno.lock')),
 	]);
 
 	let packageManager = 'npm';
@@ -26,6 +27,9 @@ export async function getPackageManagerAndInstallScript(cwd) {
 	} else if (bunLockBinaryExists || bunLockExists) {
 		installScript = 'bun install --frozen-lockfile';
 		packageManager = 'bun';
+	} else if (denoLockExists) {
+		installScript = 'deno install --frozen';
+		packageManager = 'deno';
 	} else if (packageLockExists) {
 		installScript = 'npm ci';
 	}
