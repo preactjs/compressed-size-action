@@ -201,6 +201,38 @@ By default, files are compared after gzip compression, but it's possible to use 
 compression: "none"
 ```
 
+### Specifying the base ref
+
+Use the `base-ref` option to compare against a specific ref. Otherwise, the action compares against the PR's base branch.
+
+```diff
+name: Compressed Size
+on: [pull_request]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: preactjs/compressed-size-action@v2
+      with:
++       base-ref: "v1.2.0"
+```
+
+Eg, a project could set `base-ref` conditionally to use the default PR base branch for feature PRs, but compare against `production` for release PRs (e.g. those opened by [release-please](https://github.com/googleapis/release-please)). This is useful for release PRs that only represent a version bump and wouldn't produce a meaningful size comparison. Comparing against the previous release tag instead shows cumulative size change across all changes going into the release.
+
+```yaml
+name: Compressed Size
+on: [pull_request]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - uses: preactjs/compressed-size-action@v2
+      with:
+        base-ref: ${{ startsWith(github.head_ref, 'release-please--') && 'production' || '' }}
+```
+
 ### Checking multiple bundles
 
 The action reuses the same comment each time it runs on a PR. In order to run the action multiple times against separate bundles for a single PR, you must provide a `comment-key` option, which the action will use to determine which comment to add or update for the run. The example below demonstrates this for separate "modern" and "legacy" bundles:

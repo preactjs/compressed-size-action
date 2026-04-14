@@ -9,6 +9,9 @@ inputs:
     description: 'The GITHUB_TOKEN secret'
     required: false
     default: ${{ github.token }}
+  base-ref:
+    description: 'A specific git ref (branch, tag, or SHA) to compare against instead of the PR base branch'
+    required: false
   clean-script:
     description: 'An npm-script that cleans/resets state between branch builds'
   install-script:
