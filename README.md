@@ -201,6 +201,13 @@ By default, files are compared after gzip compression, but it's possible to use 
 compression: "none"
 ```
 
+### Specifying the base ref
+
+Use the `base-ref` option to compare against a specific ref. Otherwise, the action compares against the PR's base branch.
+
+
+For example, a project could set `base-ref` conditionally to use the PR target branch for feature PRs but compare against `production` for release PRs. Comparing against the previous release tag could show cumulative size change across all changes going into the release.
+
 ### Checking multiple bundles
 
 The action reuses the same comment each time it runs on a PR. In order to run the action multiple times against separate bundles for a single PR, you must provide a `comment-key` option, which the action will use to determine which comment to add or update for the run. The example below demonstrates this for separate "modern" and "legacy" bundles:

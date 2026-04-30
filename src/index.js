@@ -37,6 +37,14 @@ async function run(octokit, context, token) {
 		);
 	}
 
+	const inputBaseRef = getInput('base-ref');
+	if (inputBaseRef) {
+		console.log(`Setting base ref to: "${inputBaseRef}"`);
+		baseRef = inputBaseRef;
+		// fallback base sha doesn't make sense if given an explicit base ref:
+		baseSha = null;
+	}
+
 	if (getInput('cwd')) process.chdir(getInput('cwd'));
 
 	const plugin = new SizePlugin({
@@ -76,15 +84,19 @@ async function run(octokit, context, token) {
 		console.log('successfully fetched base.ref');
 	} catch (e) {
 		console.log('fetching base.ref failed', e.message);
-		try {
-			await exec(`git fetch -n origin ${baseSha}`);
-			console.log('successfully fetched base.sha');
-		} catch (e) {
-			console.log('fetching base.sha failed', e.message);
+		if (baseSha === null) {
+			throw new Error('base.ref fetch failed and no base.sha as fallback');
+		} else {
 			try {
-				await exec(`git fetch -n`);
+				await exec(`git fetch -n origin ${baseSha}`);
+				console.log('successfully fetched base.sha');
 			} catch (e) {
-				console.log('fetch failed', e.message);
+				console.log('fetching base.sha failed', e.message);
+				try {
+					await exec(`git fetch -n`);
+				} catch (e) {
+					console.log('fetch failed', e.message);
+				}
 			}
 		}
 	}
@@ -101,6 +113,7 @@ async function run(octokit, context, token) {
 		if (!baseRef) throw Error('missing context.payload.base.ref');
 		await exec(`git reset --hard ${baseRef}`);
 	} catch (e) {
+		if (!baseSha) throw e;
 		await exec(`git reset --hard ${baseSha}`);
 	}
 	endGroup();
