@@ -205,33 +205,8 @@ compression: "none"
 
 Use the `base-ref` option to compare against a specific ref. Otherwise, the action compares against the PR's base branch.
 
-```diff
-name: Compressed Size
-on: [pull_request]
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v2
-    - uses: preactjs/compressed-size-action@v2
-      with:
-+       base-ref: "v1.2.0"
-```
 
-Eg, a project could set `base-ref` conditionally to use the default PR base branch for feature PRs, but compare against `production` for release PRs (e.g. those opened by [release-please](https://github.com/googleapis/release-please)). This is useful for release PRs that only represent a version bump and wouldn't produce a meaningful size comparison. Comparing against the previous release tag instead shows cumulative size change across all changes going into the release.
-
-```yaml
-name: Compressed Size
-on: [pull_request]
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v4
-    - uses: preactjs/compressed-size-action@v2
-      with:
-        base-ref: ${{ startsWith(github.head_ref, 'release-please--') && 'production' || '' }}
-```
+For example, a project could set `base-ref` conditionally to use the PR target branch for feature PRs but compare against `production` for release PRs. Comparing against the previous release tag could show cumulative size change across all changes going into the release.
 
 ### Checking multiple bundles
 

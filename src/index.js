@@ -39,7 +39,7 @@ async function run(octokit, context, token) {
 
 	const inputBaseRef = getInput('base-ref');
 	if (inputBaseRef) {
-		console.log(`Overriding base ref with input base-ref: ${inputBaseRef}`);
+		console.log(`Setting base ref to: "${inputBaseRef}"`);
 		baseRef = inputBaseRef;
 		// fallback base sha doesn't make sense if given an explicit base ref:
 		baseSha = null;
