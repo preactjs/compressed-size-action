@@ -50,6 +50,10 @@ inputs:
     description: 'The column and direction to sort the results by. The format is "column:direction", where column is one of "Filename", "Size", or "Change" and direction is "asc" or "desc". For example, "Size:desc" sorts the table by file size in descending order.'
     default: 'Filename:asc'
 
+outputs:
+  comment-body:
+    description: 'The full Markdown body the action posts to the PR, including the size report and footer.'
+
 runs:
   using: 'node24'
   main: 'index.js'

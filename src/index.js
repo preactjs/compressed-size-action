@@ -2,7 +2,7 @@ import { getInput, setFailed, startGroup, endGroup, debug } from '@actions/core'
 import { context, getOctokit } from '@actions/github';
 import { exec } from '@actions/exec';
 import { SizePlugin } from '@rschristian/size-plugin';
-import { getPackageManagerAndInstallScript, diffTable, toBool, stripHash, getSortOrder } from './utils.js';
+import { getPackageManagerAndInstallScript, diffTable, toBool, stripHash, getSortOrder, setOutput } from './utils.js';
 
 /**
  * @typedef {ReturnType<typeof import("@actions/github").getOctokit>} Octokit
@@ -169,6 +169,8 @@ async function run(octokit, context, token) {
 			markdownDiff +
 			`\n\n<a href="https://github.com/preactjs/compressed-size-action"><sub>compressed-size-action${commentKey ? `::${commentKey}` : ''}</sub></a>`
 	};
+
+	setOutput('comment-body', comment.body);
 
 	if (context.eventName !== 'pull_request' && context.eventName !== 'pull_request_target') {
 		console.log('No PR associated with this action run. Not posting a check or comment.');

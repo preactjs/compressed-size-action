@@ -1,5 +1,6 @@
 import fs from 'fs';
 import path from 'path';
+import { EOL } from 'os';
 import prettyBytes from 'pretty-bytes';
 
 /**
@@ -268,4 +269,23 @@ export function getSortOrder(sortBy) {
 	}
 	console.warn(`Invalid 'order-by' value '${sortBy}', defaulting to 'Filename:asc'`);
 	return 'Filename:asc';
+}
+
+/**
+ * 
+ * @param {string} name
+ * @param {string} value
+ */
+export function setOutput(name, value) {
+	const outputPath = process.env.GITHUB_OUTPUT;
+
+	if (outputPath) {
+		const delimiter = `ghadelimiter_${Date.now()}`;
+		fs.appendFileSync(outputPath, `${name}<<${delimiter}${EOL}${value}${EOL}${delimiter}${EOL}`);
+		return;
+	}
+
+	console.log(
+		`::set-output name=${name}::${String(value).replace(/\n/g, '%0A').replace(/\r/g, '%0D')}`
+	);
 }
