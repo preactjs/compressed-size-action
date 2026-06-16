@@ -31,6 +31,18 @@ jobs:
 
 > **Note:** Due to GitHub's permission model, this action cannot safely create comments when it is triggered by a PR from a fork. It will, however, still generate the size comparison and print the comment it would've posted to the stdout of the action, allowing manual checking and you can copy/paste it into a comment if you wish.
 
+The comment that `compressed-size-action` posts to pull requests is also exposed as the `comment-body` output. This can be used by later workflow steps to archive the report, pass it to another job, or post the comment from a separate workflow with the permissions you need:
+
+```yaml
+- id: compressed-size
+  uses: preactjs/compressed-size-action@v2
+
+- name: Save compressed size comment
+  env:
+    COMMENT_BODY: ${{ steps.compressed-size.outputs.comment-body }}
+  run: printf '%s\n' "$COMMENT_BODY" > compressed-size-comment.md
+```
+
 ### Customizing the Installation
 
 By default, `compressed-size-action` will install dependencies according to which lockfiles are present, if any. However, if you need to run a different installation command, you can pass a custom script to do so. For example, to use `npm ci` with the `--workspace` option:
