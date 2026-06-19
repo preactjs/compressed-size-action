@@ -31,7 +31,7 @@ jobs:
 
 > **Note:** Due to GitHub's permission model, this action cannot safely create comments when it is triggered by a PR from a fork. It will, however, still generate the size comparison and print the comment it would've posted to the stdout of the action, allowing manual checking and you can copy/paste it into a comment if you wish.
 
-The comment that `compressed-size-action` posts to pull requests is also exposed as the `comment-body` output. This can be used by later workflow steps to archive the report, pass it to another job, or post the comment from a separate workflow with the permissions you need:
+The markdown comment that `compressed-size-action` posts to pull requests is also exposed as the `comment-body` output. This can be used by later workflow steps to archive the report, pass it to another job, or post the comment from a separate workflow with the permissions you need:
 
 ```yaml
 - id: compressed-size
