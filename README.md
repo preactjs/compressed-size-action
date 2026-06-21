@@ -43,6 +43,8 @@ The markdown comment that `compressed-size-action` posts to pull requests is als
   run: printf '%s\n' "$COMMENT_BODY" > compressed-size-comment.md
 ```
 
+See [Pull requests from forks](#pull-requests-from-forks) for a complete example that uses this output to publish comments on forked PRs.
+
 ### Customizing the Installation
 
 By default, `compressed-size-action` will install dependencies according to which lockfiles are present, if any. However, if you need to run a different installation command, you can pass a custom script to do so. For example, to use `npm ci` with the `--workspace` option:
@@ -248,3 +250,108 @@ jobs:
 ```
 
 If you do not provide this key, the action will attempt to use (and therefore replace) the same comment for both bundles, hiding the output for whichever run finished last.
+
+### Pull requests from forks
+
+Due to GitHub's permission model, workflows triggered by `pull_request` events from forks cannot safely create PR comments with the default token. `compressed-size-action` will still generate the size comparison and expose the Markdown it would post as the `comment-body` output.
+
+To comment on forked PRs, split the work into two workflows:
+
+- a `pull_request` workflow that checks out and builds the untrusted PR code, then uploads only the generated Markdown and PR number as short-lived artifacts
+- a `workflow_run` workflow that runs in the base repository context, does not check out or execute fork code, downloads those artifacts as data, and posts the PR comment
+
+For example, `.github/workflows/ci.yml` can generate the report:
+
+```yaml
+name: CI
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+  push:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - run: npm test
+      - name: Report compressed size
+        id: compressed-size
+        uses: preactjs/compressed-size-action@v2
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          pattern: index.js
+      # Artifacts are only needed for the downstream commenter workflow.
+      - name: Save comment body
+        env:
+          COMMENT_BODY: ${{ steps.compressed-size.outputs.comment-body }}
+        run: printf '%s\n' "$COMMENT_BODY" > ./comment-body
+      - uses: actions/upload-artifact@v7
+        with:
+          name: comment-body
+          path: ./comment-body
+          retention-days: 1
+      - name: Save PR number
+        env:
+          PULL_REQUEST_NUMBER: ${{ github.event.number }}
+        run: echo "$PULL_REQUEST_NUMBER" > ./pr-number
+      - uses: actions/upload-artifact@v7
+        with:
+          name: pr-number
+          path: ./pr-number
+          retention-days: 1
+```
+
+Then `.github/workflows/commenter.yml` can post the comment after the PR workflow succeeds:
+
+```yaml
+name: Commenter
+
+on:
+  workflow_run:
+    workflows: ['CI']
+    types: [completed]
+
+jobs:
+  comment:
+    name: Comment
+    # Only handle successful PR runs from forks.
+    # Same-repository PRs can be commented on by the original pull_request workflow if it has permission.
+    if: |
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.event == 'pull_request' &&
+      github.event.workflow_run.head_repository.full_name != github.repository
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      pull-requests: write
+    steps:
+      - name: Download comment body
+        uses: actions/download-artifact@v8
+        with:
+          run-id: ${{ github.event.workflow_run.id }}
+          name: comment-body
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Download PR number
+        uses: actions/download-artifact@v8
+        with:
+          run-id: ${{ github.event.workflow_run.id }}
+          name: pr-number
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Get PR number
+        id: pr
+        run: echo "pr=$(<pr-number)" >> "$GITHUB_OUTPUT"
+      - uses: marocchino/sticky-pull-request-comment@v3
+        with:
+          path: comment-body
+          number_force: ${{ steps.pr.outputs.pr }}
+```
