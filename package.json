@@ -8,9 +8,9 @@
   },
   "license": "MIT",
   "devDependencies": {
-    "@actions/core": "^1.2.6",
-    "@actions/exec": "^1.0.4",
-    "@actions/github": "^4.0.0",
+    "@actions/core": "^3",
+    "@actions/exec": "^3",
+    "@actions/github": "^9",
     "@rschristian/size-plugin": "^0.1.0",
     "esbuild": "^0.28.2",
     "pretty-bytes": "^7",
