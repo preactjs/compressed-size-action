@@ -4,7 +4,7 @@
   "main": "index.js",
   "scripts": {
     "build": "microbundle -f cjs --define 'navigator={}' --compress --no-sourcemap --target node src/index.js",
-    "test": "jest"
+    "test": "vitest"
   },
   "license": "MIT",
   "devDependencies": {
@@ -14,11 +14,9 @@
     "@babel/core": "^7.29.0",
     "@babel/preset-env": "^7.29.0",
     "@rschristian/size-plugin": "^0.1.0",
-    "@types/jest": "^30.0.0",
-    "babel-jest": "^30.2.0",
-    "jest": "^30.2.0",
     "microbundle": "^0.15.1",
-    "pretty-bytes": "^5.4.1"
+    "pretty-bytes": "^5.4.1",
+    "vitest": "^4.0.0"
   },
   "prettier": {
     "useTabs": true,
@@ -35,9 +33,6 @@
         }
       }
     ]
-  },
-  "jest": {
-    "testEnvironment": "node"
   },
   "babel": {
     "presets": [
