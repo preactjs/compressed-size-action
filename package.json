@@ -15,7 +15,7 @@
     "@babel/preset-env": "^7.29.0",
     "@rschristian/size-plugin": "^0.1.0",
     "microbundle": "^0.15.1",
-    "pretty-bytes": "^5.4.1",
+    "pretty-bytes": "^7",
     "vitest": "^4.0.0"
   },
   "prettier": {
