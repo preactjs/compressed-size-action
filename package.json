@@ -3,7 +3,7 @@
   "version": "2.10.0",
   "main": "index.js",
   "scripts": {
-    "build": "microbundle -f cjs --define 'navigator={}' --compress --no-sourcemap --target node src/index.js",
+    "build": "esbuild src/index.js --bundle --platform=node --target=node24 --format=cjs --minify --define:navigator={} --outfile=index.js",
     "test": "vitest"
   },
   "license": "MIT",
@@ -11,10 +11,8 @@
     "@actions/core": "^1.2.6",
     "@actions/exec": "^1.0.4",
     "@actions/github": "^4.0.0",
-    "@babel/core": "^8",
-    "@babel/preset-env": "^8",
     "@rschristian/size-plugin": "^0.1.0",
-    "microbundle": "^0.15.1",
+    "esbuild": "^0.28.2",
     "pretty-bytes": "^7",
     "vitest": "^4.0.0"
   },
@@ -32,18 +30,6 @@
           "useTabs": false
         }
       }
-    ]
-  },
-  "babel": {
-    "presets": [
-      [
-        "@babel/preset-env",
-        {
-          "targets": {
-            "node": "current"
-          }
-        }
-      ]
     ]
   }
 }
