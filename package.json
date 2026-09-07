@@ -11,7 +11,6 @@
     "@actions/core": "^3",
     "@actions/exec": "^3",
     "@actions/github": "^9",
-    "@rschristian/size-plugin": "^0.1.0",
     "esbuild": "^0.28.2",
     "pretty-bytes": "^7",
     "vitest": "^4.0.0"
@@ -31,5 +30,10 @@
         }
       }
     ]
+  },
+  "dependencies": {
+    "brotli-size": "^4.0.0",
+    "gzip-size": "^7.0.0",
+    "picomatch": "^4.0.7"
   }
 }
