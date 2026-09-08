@@ -216,7 +216,7 @@ async function run(octokit, context, token) {
     try {
       const comments = (await octokit.issues.listComments(commentInfo)).data;
       const commentRegExp = new RegExp(
-        `<sub>[\s\n]*(compressed|gzip)-size-action${commentKey ? `::${commentKey}` : ""}</sub>`,
+        `<sub>\\s*(compressed|gzip)-size-action${commentKey ? `::${commentKey}` : ""}</sub>`,
       );
       for (let i = comments.length; i--; ) {
         const c = comments[i];

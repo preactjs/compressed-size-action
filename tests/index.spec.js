@@ -253,6 +253,20 @@ describe('src/index.js', () => {
 		);
 	});
 
+	test('matches a previous comment with whitespace inside the footer', async () => {
+		const octokit = makeOctokit();
+		octokit.issues.listComments.mockResolvedValue({
+			data: [{ id: 9, body: 'Report\n\n<a href="..."><sub>\n  compressed-size-action</sub></a>' }]
+		});
+
+		await runAction({ octokit });
+
+		expect(octokit.issues.createComment).not.toHaveBeenCalled();
+		expect(octokit.issues.updateComment).toHaveBeenCalledWith(
+			expect.objectContaining({ comment_id: 9 })
+		);
+	});
+
 	test('scopes the footer and comment lookup by comment-key', async () => {
 		const octokit = makeOctokit();
 		octokit.issues.listComments.mockResolvedValue({
