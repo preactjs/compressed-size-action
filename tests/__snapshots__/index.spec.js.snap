@@ -1,0 +1,19 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`src/index.js > builds both branches and posts a new PR comment 1`] = `
+"**Size Change:** +400 B (+33.33%) 🚨
+
+**Total Size:** 1.6 kB
+
+<details open><summary>📦 <strong>View Changed</strong></summary>
+
+| Filename | Size | Change |  |
+| :--- | :---: | :---: | :---: |
+| \`dist/added.js\` | 100 B | +100 B (new file) | 🆕 |
+| \`dist/index.js\` | 1.5 kB | +500 B (+50%) | 🆘 |
+| \`dist/removed.js\` | 0 B | -200 B (removed) | 🏆 |
+
+</details>
+
+<a href="https://github.com/preactjs/compressed-size-action"><sub>compressed-size-action</sub></a>"
+`;
