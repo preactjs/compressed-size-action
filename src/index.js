@@ -74,8 +74,9 @@ async function run(octokit, context, token) {
 
 	const newSizes = await plugin.readFromDisk(cwd);
 
-	// In case the build step alters a JSON-file, ....
-	await exec(`git reset --hard`);
+	// In case the build step alters a JSON-file, ... also reset submodules so
+	// the base checkout below moves them to the recorded commit.
+	await exec(`git reset --hard --recurse-submodules`);
 
 	startGroup(`[base] Checkout target branch`);
 	try {
@@ -111,10 +112,10 @@ async function run(octokit, context, token) {
 	console.log('checking out and building base commit');
 	try {
 		if (!baseRef) throw Error('missing context.payload.base.ref');
-		await exec(`git reset --hard ${baseRef}`);
+		await exec(`git reset --hard --recurse-submodules ${baseRef}`);
 	} catch (e) {
 		if (!baseSha) throw e;
-		await exec(`git reset --hard ${baseSha}`);
+		await exec(`git reset --hard --recurse-submodules ${baseSha}`);
 	}
 	endGroup();
 
@@ -134,8 +135,8 @@ async function run(octokit, context, token) {
 	await exec(`${packageManager} run ${buildScript}`);
 	endGroup();
 
-	// In case the build step alters a JSON-file, ....
-	await exec(`git reset --hard`);
+	// In case the build step alters a JSON-file, ... submodules included.
+	await exec(`git reset --hard --recurse-submodules`);
 
 	const oldSizes = await plugin.readFromDisk(cwd);
 
